@@ -7,7 +7,10 @@ User = get_user_model()
 
 
 class Tag(models.Model):
-    name = models.CharField(max_length=200, verbose_name='Название')
+    name = models.CharField(
+        max_length=200,
+        verbose_name='Название'
+    )
     color = models.CharField(
         max_length=7,
         null=True,
@@ -23,7 +26,15 @@ class Tag(models.Model):
 
 
 class Ingridient(models.Model):
-    pass
+    name = models.CharField(
+        max_length=200,
+        verbose_name='Название'
+    )
+    measurement_unit = models.CharField(
+        max_length=200,
+        verbose_name='Единица измерения'
+    )
+
 
 
 class Recipe(models.Model):
@@ -45,17 +56,16 @@ class Recipe(models.Model):
     )
     tags = models.ManyToManyField(
         Tag,
-        through=TagRecipe,
+        through='TagRecipe',
         verbose_name='Список тегов'
     )
     image = models.ImageField(
-        # дописать
+        upload_to = 'recipes/images/',
         verbose_name='Ссылка на картинку на сайте'
-
     )
     ingridients = models.ManyToManyField(
         Ingridient,
-        through=IngridientRecipe,
+        through='IngridientRecipe',
         verbose_name='Список ингридиентов'
     )
     is_in_shopping_cart = models.BooleanField(
@@ -70,30 +80,30 @@ class Recipe(models.Model):
 
 
 class TagRecipe(models.Model):
-    tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
-    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
+    tag = models.ForeignKey(
+        Tag,
+        on_delete=models.CASCADE,
+        related_name='tag_recipe',
+        verbose_name='Тег'
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='tag_recipe',
+        verbose_name='Рецепт'
+    )
 
 
 class IngridientRecipe(models.Model):
     ingridient = models.ForeignKey(
         Ingridient,
         on_delete=models.CASCADE,
+        related_name='ingridient_recipe',
         verbose_name='Ингридиент'
-    ),
+    )
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
+        related_name='ingridient_recipe',
         verbose_name='Рецепт'
     )
-
-
-class Follow(models.Model):
-    pass
-
-
-class Favourite(models.Model):
-    pass
-
-
-class ShoppingList(models.Model):
-    pass
