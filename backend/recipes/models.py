@@ -13,19 +13,16 @@ class Tag(models.Model):
     )
     color = models.CharField(
         max_length=7,
-        null=True,
-        blank=True,
         verbose_name='Цвет в HEX'
     )
     slug = models.SlugField(
         max_length=200,
-        null=True,
-        blank=True,
+        unique = True,
         verbose_name='Уникальный слаг'
     )
 
 
-class Ingridient(models.Model):
+class Ingredient(models.Model):
     name = models.CharField(
         max_length=200,
         verbose_name='Название'
@@ -51,7 +48,7 @@ class Recipe(models.Model):
     text = models.TextField(
         verbose_name='Описание'
     )
-    cooking_time = models.IntegerField(
+    cooking_time = models.PositiveSmallIntegerField(
         verbose_name='Время приготовления (в минутах)'
     )
     tags = models.ManyToManyField(
@@ -63,9 +60,9 @@ class Recipe(models.Model):
         upload_to = 'recipes/images/',
         verbose_name='Ссылка на картинку на сайте'
     )
-    ingridients = models.ManyToManyField(
-        Ingridient,
-        through='IngridientRecipe',
+    ingredients = models.ManyToManyField(
+        Ingredient,
+        through='IngredientRecipe',
         verbose_name='Список ингридиентов'
     )
     is_in_shopping_cart = models.BooleanField(
@@ -80,13 +77,13 @@ class Recipe(models.Model):
 
 
 class TagRecipe(models.Model):
-    tag = models.ForeignKey(
+    tag_id = models.ForeignKey(
         Tag,
         on_delete=models.CASCADE,
         related_name='tag_recipe',
         verbose_name='Тег'
     )
-    recipe = models.ForeignKey(
+    recipe_id = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
         related_name='tag_recipe',
@@ -94,16 +91,34 @@ class TagRecipe(models.Model):
     )
 
 
-class IngridientRecipe(models.Model):
-    ingridient = models.ForeignKey(
-        Ingridient,
+class IngredientRecipe(models.Model):
+    ingredient_id = models.ForeignKey(
+        Ingredient,
         on_delete=models.CASCADE,
-        related_name='ingridient_recipe',
+        related_name='ingredient_recipe',
         verbose_name='Ингридиент'
     )
-    recipe = models.ForeignKey(
+    recipe_id = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        related_name='ingridient_recipe',
+        related_name='ingredient_recipe',
         verbose_name='Рецепт'
+    )
+
+
+class AmountIngridientInRecipe(models.Model):
+    ingredient_id = ingredient_id = models.OneToOneField(
+        Ingredient,
+        on_delete=models.CASCADE,
+        related_name='amount_ingredient',
+        verbose_name='Ингридиент'
+    )
+    recipe_id = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='amount_recipe',
+        verbose_name='Рецепт'
+    )
+    quantity = models.PositiveBigIntegerField(
+        verbose_name='Количество'
     )
