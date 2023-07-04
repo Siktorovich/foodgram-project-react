@@ -1,0 +1,45 @@
+Table users {
+    id Autofield [pk]
+    name CharField [note: 'max_length=200']
+}
+
+Table tag {
+    id Autofield [pk]
+    name CharField [note: 'max_length=200']
+    color CharField [note: 'max_length=7']
+    slug SlugField [note: 'unique=True, max_length=200']
+ }
+
+Table ingredient {
+    id Autofield [pk]
+    name CharField [note: 'max_length=200']
+    measurement_unit CharField [note: 'max_length=200']
+}
+
+Table recipe {
+    id Autofield [pk]
+    author ForeignKey [ref: > users.id, note: 'on-delete.CASCADE, related_name=recipes']
+    name CharField [note: 'max_length=200']
+    text TextField
+    cooking_time PositiveSmallIntegerField
+    image ImageField
+    is_in_shopping_cart BooleanField
+    is_favourited BooleanField
+}
+
+Table tag_recipe {
+    tag_id ForeignKey [ref: > tag.id, note: 'on-delete:CASCADE, related_name=tag_recipe']
+    recipe_id ForeignKey [ref: > recipe.id, note: 'on-delete:CASCADE, related_name=tag_recipe']
+}
+
+Table ingredient_recipe {
+    ingridient_id ForeignKey [ref: > ingredient.id, note: 'on-delete:CASCADE, related_name=ingridient_recipe']
+    recipe_id ForeignKey [ref: > recipe.id, note: 'on-delete:CASCADE, related_name=ingridient_recipe']
+}
+
+Table amount_ingridient_in_recipe {
+    ingridient_id OneToOneField [ref: > ingredient.id, note: 'on-delete:CASCADE, related_name=amount_ingredient']
+    recipe_id ForeignKey [ref: > recipe.id, note: 'on-delete:CASCADE, related_name=amount_recipe']
+    quantity PositiveSmallIntegerField
+}
+
