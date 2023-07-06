@@ -33,13 +33,12 @@ Table tag_recipe {
 }
 
 Table ingredient_recipe {
-    ingridient_id ForeignKey [ref: > ingredient.id, note: 'on-delete:CASCADE, related_name=ingridient_recipe']
-    recipe_id ForeignKey [ref: > recipe.id, note: 'on-delete:CASCADE, related_name=ingridient_recipe']
+    ingredient_id ForeignKey [ref: > ingredient.id, note: 'on-delete:CASCADE, related_name=ingredient_recipe']
+    recipe_id ForeignKey [ref: > recipe.id, note: 'on-delete:CASCADE, related_name=ingredient_recipe']
 }
 
-Table amount_ingridient_in_recipe {
-    ingridient_id OneToOneField [ref: > ingredient.id, note: 'on-delete:CASCADE, related_name=amount_ingredient']
+Table amount_ingredient_in_recipe {
+    ingredient_id OneToOneField [ref: > ingredient.id, note: 'on-delete:CASCADE, related_name=amount_ingredient']
     recipe_id ForeignKey [ref: > recipe.id, note: 'on-delete:CASCADE, related_name=amount_recipe']
     quantity PositiveSmallIntegerField
 }
-
