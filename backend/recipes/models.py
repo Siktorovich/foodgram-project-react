@@ -12,11 +12,14 @@ class Tag(models.Model):
     )
     color = models.CharField(
         max_length=7,
+        null=True,
+        blank=True,
         verbose_name='Цвет в HEX'
     )
     slug = models.SlugField(
         max_length=200,
-        unique = True,
+        null=True,
+        blank=True,
         verbose_name='Уникальный слаг'
     )
 
@@ -25,7 +28,7 @@ class Tag(models.Model):
         verbose_name_plural = 'Теги'
 
     def __str__(self):
-        return self.slug
+        return self.name
 
 
 class Ingredient(models.Model):
@@ -75,7 +78,8 @@ class Recipe(models.Model):
     ingredients = models.ManyToManyField(
         Ingredient,
         through='IngredientRecipe',
-        verbose_name='Список ингридиентов'
+        verbose_name='Список ингридиентов',
+        related_name='recipe'
     )
     is_in_shopping_cart = models.BooleanField(
         verbose_name='Находится ли в корзине'
@@ -141,7 +145,7 @@ class AmountIngredientInRecipe(models.Model):
         related_name='amount_recipe',
         verbose_name='Рецепт'
     )
-    quantity = models.PositiveBigIntegerField(
+    amount = models.PositiveBigIntegerField(
         verbose_name='Количество'
     )
 
