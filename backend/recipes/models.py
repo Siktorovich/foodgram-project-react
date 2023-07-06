@@ -5,7 +5,6 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 
-
 class Tag(models.Model):
     name = models.CharField(
         max_length=200,
@@ -21,6 +20,13 @@ class Tag(models.Model):
         verbose_name='Уникальный слаг'
     )
 
+    class Meta:
+        verbose_name = 'Тег'
+        verbose_name_plural = 'Теги'
+
+    def __str__(self):
+        return self.slug
+
 
 class Ingredient(models.Model):
     name = models.CharField(
@@ -32,6 +38,12 @@ class Ingredient(models.Model):
         verbose_name='Единица измерения'
     )
 
+    class Meta:
+        verbose_name = 'Ингридиент'
+        verbose_name_plural = 'Ингридиенты'
+
+    def __str__(self):
+        return self.name
 
 
 class Recipe(models.Model):
@@ -72,6 +84,10 @@ class Recipe(models.Model):
         verbose_name='Находится ли в избранном'
     )
 
+    class Meta:
+        verbose_name = 'Рецепт'
+        verbose_name_plural = 'Рецепты'
+
     def __str__(self):
         return self.name
 
@@ -90,6 +106,9 @@ class TagRecipe(models.Model):
         verbose_name='Рецепт'
     )
 
+    def __str__(self):
+        return f'{self.tag_id} {self.recipe_id}' 
+
 
 class IngredientRecipe(models.Model):
     ingredient_id = models.ForeignKey(
@@ -105,8 +124,11 @@ class IngredientRecipe(models.Model):
         verbose_name='Рецепт'
     )
 
+    def __str__(self):
+        return f'{self.ingredient_id} {self.recipe_id}'
 
-class AmountIngridientInRecipe(models.Model):
+
+class AmountIngredientInRecipe(models.Model):
     ingredient_id = ingredient_id = models.OneToOneField(
         Ingredient,
         on_delete=models.CASCADE,
@@ -122,3 +144,10 @@ class AmountIngridientInRecipe(models.Model):
     quantity = models.PositiveBigIntegerField(
         verbose_name='Количество'
     )
+
+    class Meta:
+        verbose_name = 'Количество ингридиента'
+        verbose_name_plural = 'Количество ингридиентов'
+
+    def __str__(self):
+        return self.amount
