@@ -157,17 +157,17 @@ class AmountIngredientInRecipe(models.Model):
         return self.amount
 
 
-class Follow(models.Model):
-    user = models.ForeignKey(
+class Subscriber(models.Model):
+    user_id = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='follower',
+        related_name='subscriber',
         verbose_name='Подписчик'
     )
-    follower = models.ForeignKey(
+    subscriber_id = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='following',
+        related_name='subscribing',
         verbose_name='На кого подписались'
     )
 
