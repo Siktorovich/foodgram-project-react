@@ -1,4 +1,4 @@
-Table users {
+Table user {
     id Autofield [pk]
     name CharField [note: 'max_length=200']
 }
@@ -18,7 +18,7 @@ Table ingredient {
 
 Table recipe {
     id Autofield [pk]
-    author ForeignKey [ref: > users.id, note: 'on-delete.CASCADE, related_name=recipes']
+    author ForeignKey [ref: > user.id, note: 'on-delete.CASCADE, related_name=recipes']
     name CharField [note: 'max_length=200']
     text TextField
     cooking_time PositiveSmallIntegerField
@@ -41,4 +41,9 @@ Table amount_ingredient_in_recipe {
     ingredient_id OneToOneField [ref: > ingredient.id, note: 'on-delete:CASCADE, related_name=amount_ingredient']
     recipe_id ForeignKey [ref: > recipe.id, note: 'on-delete:CASCADE, related_name=amount_recipe']
     quantity PositiveSmallIntegerField
+}
+
+Table subscribe {
+    user_id ForeignKey [ref: > user.id, note: 'on_delete:CASCADE, related_name=subscriber']
+    subscriber_id ForeignKey [ref: > user.id, note: 'on_delete:CASCADE, related_name=subscribing']
 }
