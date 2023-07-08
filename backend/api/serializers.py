@@ -17,15 +17,19 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    
+    email = serializers.EmailField(required=True)
+    first_name = serializers.CharField(required=True)
+    last_name = serializers.CharField(required=True)
+    password = serializers.CharField(required=True)
+
     class Meta:
         model = User
         fields = (
             'email',
-            'id',
             'username',
             'first_name',
-            'last_name'
+            'last_name',
+            'password',
         )
 
 class IngredientWithAmountSerializer(serializers.ModelSerializer):
