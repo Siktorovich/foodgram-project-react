@@ -1,8 +1,35 @@
+from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.contrib.auth import get_user_model
 
 
-User = get_user_model()
+ROLES = (
+    ('user', 'user'),
+    ('admin', 'admin'),
+)
+
+
+class User(AbstractUser):
+    role = models.CharField(
+        max_length=50,
+        choices=ROLES,
+        default='user',
+        verbose_name='Роль пользователя',
+    )
+    is_subscribed = models.BooleanField(
+        null=True,
+        blank=True,
+        verbose_name='Подписан ли текущий пользователь на этого'
+    )
+
+    class Meta:
+        db_table = 'auth_user'
+        verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователи'
+
+    def save(self, *args, **kwargs):
+        if self.is_superuser:
+            self.role = 'admin'
+        super().save(*args, **kwargs)
 
 
 class Tag(models.Model):
