@@ -3,7 +3,6 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
-
 ROLES = (
     ('user', 'user'),
     ('admin', 'admin'),
@@ -11,9 +10,6 @@ ROLES = (
 
 
 class User(AbstractUser):
-    first_name = models.CharField(max_length=150)
-    last_name = models.CharField(max_length=150)
-    email = models.EmailField()
     role = models.CharField(
         max_length=50,
         choices=ROLES,
@@ -35,8 +31,3 @@ class User(AbstractUser):
         if self.is_superuser:
             self.role = 'admin'
         super().save(*args, **kwargs)
-    
-    REQUIRED_FIELDS = [
-        "first_name",
-        "last_name",
-    ]

@@ -5,26 +5,26 @@ from recipes.models import User
 
 from users.serializers import UserCreateSerializer, UserSerializer
 
-class CreateListRetrieveViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
-                                mixins.RetrieveModelMixin, viewsets.GenericViewSet):
-    pass
+# class CreateListRetrieveViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
+#                                 mixins.RetrieveModelMixin, viewsets.GenericViewSet):
+#     pass
 
 
-class UserViewSet(CreateListRetrieveViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+# class UserViewSet(CreateListRetrieveViewSet):
+#     queryset = User.objects.all()
+#     serializer_class = UserSerializer
 
-    def get_serializer_class(self):
-        if self.action == 'create':
-            return UserCreateSerializer
-        return UserSerializer
+#     def get_serializer_class(self):
+#         if self.action == 'create':
+#             return UserCreateSerializer
+#         return UserSerializer
 
 
-class UserMeView(views.APIView):
+# class UserMeView(views.APIView):
 
-    def get(self, request, *args, **kwargs):
-        queryset = User.objects.all()
-        print(request.user.pk)
-        user = get_object_or_404(queryset, pk=request.user.pk)
-        serializer = UserSerializer(user)
-        return Response(data=serializer.data)
+#     def get(self, request, *args, **kwargs):
+#         queryset = User.objects.all()
+#         print(request.user.pk)
+#         user = get_object_or_404(queryset, pk=request.user.pk)
+#         serializer = UserSerializer(user)
+#         return Response(data=serializer.data)
