@@ -1,6 +1,17 @@
+enum ROLES {
+    user
+    admin
+}
+
+
 Table user {
     id Autofield [pk]
-    name CharField [note: 'max_length=200']
+    username CharField [note: 'max_length=150, unique=True']
+    email EmailField [note: 'max_length=254']
+    first_name CharField [note: 'max_length=150']
+    last_name CharField [note: 'max_length=150']
+    is_subscribed BooleanField [note: 'null=True, blank=True']
+    role SCORES [note: 'Charfield(choices=ROLES']
 }
 
 Table tag {
