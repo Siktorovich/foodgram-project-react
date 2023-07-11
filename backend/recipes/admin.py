@@ -12,7 +12,7 @@ class RecipeAdmin(admin.ModelAdmin):
         'cooking_time',
         'image',
         'is_in_shopping_cart',
-        'is_favourited',
+        'is_favorited',
     )
 
 
