@@ -1,9 +1,8 @@
-from django.contrib.auth import get_user_model
-
 from rest_framework import serializers
 
-from recipes.models import Ingredient, Recipe, Tag, User
+from recipes.models import Ingredient, Recipe, Tag
 
+from users.serializers import UserSerializer
 
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
@@ -15,22 +14,6 @@ class TagSerializer(serializers.ModelSerializer):
             'slug',
         )
 
-
-class UserSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(required=True)
-    first_name = serializers.CharField(required=True)
-    last_name = serializers.CharField(required=True)
-    password = serializers.CharField(required=True)
-
-    class Meta:
-        model = User
-        fields = (
-            'email',
-            'username',
-            'first_name',
-            'last_name',
-            'password',
-        )
 
 class IngredientWithAmountSerializer(serializers.ModelSerializer):
     amount = serializers.IntegerField(source='amount_ingredient.amount')
@@ -65,7 +48,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             'tags',
             'author',
             'ingredients',
-            'is_favourited',
+            'is_favorited',
             'is_in_shopping_cart',
             'name',
             'image',
