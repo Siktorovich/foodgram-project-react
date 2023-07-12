@@ -170,3 +170,22 @@ class Subscriber(models.Model):
     class Meta:
         verbose_name = 'Подписка'
         verbose_name_plural = 'Подписки'
+
+
+class Favorite(models.Model):
+    user_id = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='favorite',
+        verbose_name='Подписавшийся'
+    )
+    recipe_id = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='favorite',
+        verbose_name='Избранный рецепт',
+    )
+
+    class Meta:
+        verbose_name = 'Избранное'
+        verbose_name_plural = 'Список избранного'
