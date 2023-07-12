@@ -58,3 +58,8 @@ Table subscribe {
     user_id ForeignKey [ref: > user.id, note: 'on_delete:CASCADE, related_name=subscriber']
     subscriber_id ForeignKey [ref: > user.id, note: 'on_delete:CASCADE, related_name=subscribing']
 }
+
+Table favorite {
+    user_id ForeignKey [ref: > user.id, note: 'on_delete:CASCADE, related_name=favorite']
+    recipe_id ForeignKey [ref: > recipe.id, note: 'on_delete:CASCADE, related_name=favorite']
+}
