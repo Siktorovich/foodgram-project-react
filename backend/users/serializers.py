@@ -1,5 +1,3 @@
-import djoser
-
 from rest_framework import serializers
 
 from recipes.models import Subscriber
@@ -46,5 +44,4 @@ class UserSerializer(serializers.ModelSerializer):
         return Subscriber.objects.filter(
             user_id=obj.pk,
             subscriber_id=request.user.pk
-            ).exists()
-
+        ).exists()

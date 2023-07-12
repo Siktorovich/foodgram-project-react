@@ -1,10 +1,10 @@
 from rest_framework import serializers
-
-from recipes.models import Ingredient, Recipe, Tag
-
 from users.serializers import UserSerializer
+from recipes.models import Recipe, Ingredient, Tag
+
 
 class TagSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Tag
         fields = (
@@ -17,17 +17,19 @@ class TagSerializer(serializers.ModelSerializer):
 
 class IngredientWithAmountSerializer(serializers.ModelSerializer):
     amount = serializers.IntegerField(source='amount_ingredient.amount')
+
     class Meta:
         model = Ingredient
         fields = (
             'id',
             'name',
             'measurement_unit',
-            'amount'
+            'amount',
         )
 
 
 class IngredientSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Ingredient
         fields = (
@@ -41,6 +43,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True)
     author = UserSerializer()
     ingredients = IngredientWithAmountSerializer(many=True)
+
     class Meta:
         model = Recipe
         fields = (

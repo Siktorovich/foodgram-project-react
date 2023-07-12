@@ -1,4 +1,4 @@
-import os 
+import os
 
 from pathlib import Path
 
@@ -111,7 +111,7 @@ REST_FRAMEWORK = {
 
 DJOSER = {
     "LOGIN_FIELD": "email",
-    "SERIALIZERS" : {
+    "SERIALIZERS": {
         'user': 'users.serializers.UserSerializer',
         'user_create': 'users.serializers.UserCreateSerializer',
         'current_user': 'users.serializers.UserSerializer',

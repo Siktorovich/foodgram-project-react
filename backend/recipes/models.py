@@ -1,6 +1,7 @@
 from django.db import models
 from users.models import User
 
+
 class Tag(models.Model):
     name = models.CharField(
         max_length=200,
@@ -68,7 +69,7 @@ class Recipe(models.Model):
         verbose_name='Список тегов'
     )
     image = models.ImageField(
-        upload_to = 'recipes/images/',
+        upload_to='recipes/images/',
         verbose_name='Ссылка на картинку на сайте'
     )
     ingredients = models.ManyToManyField(
@@ -107,7 +108,7 @@ class TagRecipe(models.Model):
     )
 
     def __str__(self):
-        return f'{self.tag_id} {self.recipe_id}' 
+        return f'{self.tag_id} {self.recipe_id}'
 
 
 class IngredientRecipe(models.Model):

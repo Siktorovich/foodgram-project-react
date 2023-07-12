@@ -11,7 +11,8 @@ DATABASE_NAME = 'db.sqlite3'
 
 
 class Command(BaseCommand):
-    help = ('Import data from data directory ONLY in Ingredient model. Can be extend.'
+    help = ('Import data from data directory ONLY in Ingredient model.'
+            'Can be extend.'
             'For executing use python3 manage.py import_data')
 
     def starting_import(self):
@@ -42,7 +43,6 @@ class Command(BaseCommand):
                 sys.exit(f'{FILENAME}, line {reader.line_num}: {err}')
             conn.commit()
             conn.close()
-
 
     def handle(self, *args, **kwargs):
         self.starting_import()
