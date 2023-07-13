@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from users.serializers import UserSerializer
-from recipes.models import Recipe, Ingredient, Tag
+from recipes.models import Cart, Favorite, Recipe, Ingredient, Tag
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -43,6 +43,8 @@ class RecipeSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True)
     author = UserSerializer()
     ingredients = IngredientWithAmountSerializer(many=True)
+    is_in_shopping_cart = serializers.SerializerMethodField()
+    is_favorited = serializers.SerializerMethodField()
 
     class Meta:
         model = Recipe
@@ -58,3 +60,17 @@ class RecipeSerializer(serializers.ModelSerializer):
             'text',
             'cooking_time',
         )
+    
+    def get_is_in_shopping_cart(self, obj):
+        request = self.context.get('request')
+        return Cart.objects.filter(
+            user_id=request.user.pk,
+            recipe_id=obj.pk
+        ).exists()
+
+    def get_is_favorited(self, obj):
+        request = self.context.get('request')
+        return Favorite.objects.filter(
+            user_id=request.user.pk,
+            recipe_id=obj.pk
+        ).exists()
