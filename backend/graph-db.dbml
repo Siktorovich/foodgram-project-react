@@ -10,7 +10,6 @@ Table user {
     email EmailField [note: 'max_length=254']
     first_name CharField [note: 'max_length=150']
     last_name CharField [note: 'max_length=150']
-    is_subscribed BooleanField [note: 'null=True, blank=True']
     role SCORES [note: 'Charfield(choices=ROLES']
 }
 
@@ -34,8 +33,6 @@ Table recipe {
     text TextField
     cooking_time PositiveSmallIntegerField
     image ImageField
-    is_in_shopping_cart BooleanField
-    is_favourited BooleanField
 }
 
 Table tag_recipe {
