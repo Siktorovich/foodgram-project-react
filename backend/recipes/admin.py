@@ -11,8 +11,6 @@ class RecipeAdmin(admin.ModelAdmin):
         'text',
         'cooking_time',
         'image',
-        'is_in_shopping_cart',
-        'is_favorited',
     )
 
 
