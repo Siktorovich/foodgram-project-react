@@ -17,6 +17,9 @@ class Command(BaseCommand):
 
     def starting_import(self):
         self.imported_counter = 0
+        self.stdout.write(
+            f'Import {FILENAME} starts\n'
+        )
 
     def finalise(self):
         self.stdout.write(
