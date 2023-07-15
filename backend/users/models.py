@@ -16,11 +16,6 @@ class User(AbstractUser):
         default='user',
         verbose_name='Роль пользователя',
     )
-    is_subscribed = models.BooleanField(
-        null=True,
-        blank=True,
-        verbose_name='Подписан ли текущий пользователь на этого'
-    )
 
     class Meta:
         db_table = 'auth_user'

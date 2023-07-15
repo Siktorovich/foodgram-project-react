@@ -78,12 +78,6 @@ class Recipe(models.Model):
         verbose_name='Список ингридиентов',
         related_name='recipe'
     )
-    is_in_shopping_cart = models.BooleanField(
-        verbose_name='Находится ли в корзине'
-    )
-    is_favorited = models.BooleanField(
-        verbose_name='Находится ли в избранном'
-    )
 
     class Meta:
         verbose_name = 'Рецепт'
@@ -169,6 +163,7 @@ class Subscriber(models.Model):
     )
 
     class Meta:
+        unique_together = ('user_id', 'subscriber_id')
         verbose_name = 'Подписка'
         verbose_name_plural = 'Подписки'
 
@@ -188,6 +183,7 @@ class Favorite(models.Model):
     )
 
     class Meta:
+        unique_together = ('user_id', 'recipe_id')
         verbose_name = 'Избранное'
         verbose_name_plural = 'Список избранного'
 
@@ -207,6 +203,6 @@ class Cart(models.Model):
     )
 
     class Meta:
+        unique_together = ('user_id', 'recipe_id')
         verbose_name = 'Покупка'
         verbose_name_plural = 'Список покупок'
-
