@@ -4,6 +4,7 @@ import webcolors
 from django.core.files.base import ContentFile
 from rest_framework import serializers
 from rest_framework import serializers
+from api.utils import CreateSerializer, RepresentSerializer
 from users.serializers import UserSerializer
 from recipes.models import Cart, Favorite, Recipe, Ingredient, Subscriber, Tag
 
@@ -23,19 +24,51 @@ class Hex2NameColor(serializers.Field):
 
 class Base64ImageField(serializers.ImageField):
     def to_internal_value(self, data):
-        if isinstance(data, basestring) and data.startswith('data:image'):
+        if isinstance(data, str) and data.startswith('data:image'):
             format, imgstr = data.split(';base64,')
             ext = format.split('/')[-1]
 
             data = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
 
-        return super(Base64ImageField, self).to_internal_value(data)
+        return super().to_internal_value(data)
+
+
+class CartRepresentSerializer(serializers.ModelSerializer):
+    id = serializers.ReadOnlyField(source='recipe_id.id')
+    name = serializers.ReadOnlyField(source='recipe_id.name')
+    image = Base64ImageField(source='recipe_id.image')
+    cooking_time = serializers.ReadOnlyField(source='recipe_id.cooking_time')
+
+    class Meta:
+        model = Favorite
+        fields = (
+            'id',
+            'name',
+            'image',
+            'cooking_time',
+        )
+
+
+class CartCreateSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Cart
+        fields = (
+            'user_id',
+            'recipe_id',
+        )
+
+    def to_representation(self, instance):
+        request = self.context.get('request')
+        return CartRepresentSerializer(
+            instance, context = {'request': request}
+        ).data
 
 
 class FavoriteRepresentSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField(source='recipe_id.id')
     name = serializers.ReadOnlyField(source='recipe_id.name')
-    image = serializers.ReadOnlyField(source='recipe_id.image')
+    image = Base64ImageField(source='recipe_id.image')
     cooking_time = serializers.ReadOnlyField(source='recipe_id.cooking_time')
 
     class Meta:

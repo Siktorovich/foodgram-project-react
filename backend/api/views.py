@@ -1,8 +1,9 @@
 from django.core import serializers
 from django.shortcuts import get_object_or_404
 from rest_framework import response, decorators, views, viewsets, status, mixins, generics
-from recipes.models import Favorite, Ingredient, Recipe, Tag, Subscriber, User
-from .serializers import (
+from recipes.models import Cart, Favorite, Ingredient, Recipe, Tag, Subscriber, User
+from api.serializers import (
+    CartCreateSerializer,
     FavoriteCreateSerializer,
     IngredientSerializer,
     RecipeSerializer,
@@ -10,6 +11,8 @@ from .serializers import (
     SubscribeSerializer,
     SubscribeUserSerializer,
 )
+from api.utils import CreateDeleteAPIView
+
 
 class ListViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     pass
@@ -74,4 +77,25 @@ class FavoriteView(views.APIView):
             recipe_id=recipe_id
         )
         favorite.delete()
+        return response.Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class CartView(views.APIView):
+   
+    def post(self, request, recipe_id):
+        serializer = CartCreateSerializer(
+            data={'user_id': request.user.id, 'recipe_id': recipe_id}
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return response.Response(data=serializer.data, status=status.HTTP_201_CREATED)
+        return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, recipe_id):
+        cart = get_object_or_404(
+            Cart,
+            user_id=request.user.id,
+            recipe_id=recipe_id
+        )
+        cart.delete()
         return response.Response(status=status.HTTP_204_NO_CONTENT)
