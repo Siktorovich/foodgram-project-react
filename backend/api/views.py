@@ -1,21 +1,23 @@
-from django.core import serializers
-from django.shortcuts import get_object_or_404
-from rest_framework import response, decorators, views, viewsets, status, mixins, generics
-from recipes.models import Cart, Favorite, Ingredient, Recipe, Tag, Subscriber, User
 from api.serializers import (
     CartCreateSerializer,
     FavoriteCreateSerializer,
     IngredientSerializer,
     RecipeSerializer,
-    TagSerializer,
     SubscribeSerializer,
     SubscribeUserSerializer,
+    TagSerializer
 )
-from api.utils import CreateDeleteAPIView
+
+from django.shortcuts import get_object_or_404
+
+from recipes.models import Cart, Favorite, Ingredient, Recipe, Subscriber, Tag
+
+from rest_framework import mixins, response, status, views, viewsets
 
 
 class ListViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     pass
+
 
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
@@ -35,12 +37,18 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
 class SubscribeView(views.APIView):
     def post(self, request, user_id):
         serializer = SubscribeUserSerializer(
-            data={'user_id':request.user.id, 'subscriber_id':user_id}
+            data={'user_id': request.user.id, 'subscriber_id': user_id}
         )
         if serializer.is_valid():
             serializer.save()
-            return response.Response(data=serializer.data, status=status.HTTP_201_CREATED)
-        return response.Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return response.Response(
+                data=serializer.data,
+                status=status.HTTP_201_CREATED
+            )
+        return response.Response(
+            data=serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
     def delete(self, request, user_id):
         subscribe = get_object_or_404(
@@ -60,15 +68,21 @@ class SubscribeList(ListViewSet):
 
 
 class FavoriteView(views.APIView):
-    
+
     def post(self, request, recipe_id):
         serializer = FavoriteCreateSerializer(
             data={'user_id': request.user.id, 'recipe_id': recipe_id}
         )
         if serializer.is_valid():
             serializer.save()
-            return response.Response(data=serializer.data, status=status.HTTP_201_CREATED)
-        return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return response.Response(
+                data=serializer.data,
+                status=status.HTTP_201_CREATED
+            )
+        return response.Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
     def delete(self, request, recipe_id):
         favorite = get_object_or_404(
@@ -81,15 +95,21 @@ class FavoriteView(views.APIView):
 
 
 class CartView(views.APIView):
-   
+
     def post(self, request, recipe_id):
         serializer = CartCreateSerializer(
             data={'user_id': request.user.id, 'recipe_id': recipe_id}
         )
         if serializer.is_valid():
             serializer.save()
-            return response.Response(data=serializer.data, status=status.HTTP_201_CREATED)
-        return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return response.Response(
+                data=serializer.data,
+                status=status.HTTP_201_CREATED
+            )
+        return response.Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
     def delete(self, request, recipe_id):
         cart = get_object_or_404(

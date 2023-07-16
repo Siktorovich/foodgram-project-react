@@ -4,7 +4,6 @@ import sys
 
 from django.core.management.base import BaseCommand
 
-
 DATA_PATH = '../data/'
 FILENAME = 'ingredients.csv'
 DATABASE_NAME = 'db.sqlite3'

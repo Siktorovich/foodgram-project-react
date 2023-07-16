@@ -1,12 +1,12 @@
 import base64
-import webcolors
 
 from django.core.files.base import ContentFile
+
+from recipes.models import Cart, Favorite, Ingredient, Recipe, Subscriber, Tag
 from rest_framework import serializers
-from rest_framework import serializers
-from api.utils import CreateSerializer, RepresentSerializer
 from users.serializers import UserSerializer
-from recipes.models import Cart, Favorite, Recipe, Ingredient, Subscriber, Tag
+
+import webcolors
 
 
 class Hex2NameColor(serializers.Field):
@@ -50,7 +50,7 @@ class CartRepresentSerializer(serializers.ModelSerializer):
 
 
 class CartCreateSerializer(serializers.ModelSerializer):
-    
+
     class Meta:
         model = Cart
         fields = (
@@ -61,7 +61,7 @@ class CartCreateSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         request = self.context.get('request')
         return CartRepresentSerializer(
-            instance, context = {'request': request}
+            instance, context={'request': request}
         ).data
 
 
@@ -93,7 +93,7 @@ class FavoriteCreateSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         request = self.context.get('request')
         return FavoriteRepresentSerializer(
-            instance, context = {'request': request}
+            instance, context={'request': request}
         ).data
 
 
@@ -136,7 +136,7 @@ class SubscribeSerializer(serializers.ModelSerializer):
         return Subscriber.objects.filter(
             user_id=obj.user_id,
             subscriber_id=obj.subscriber_id
-        ).exists() 
+        ).exists()
 
     def get_recipes(self, obj):
         queryset = Recipe.objects.filter(author=obj.subscriber_id)
@@ -228,7 +228,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             'text',
             'cooking_time',
         )
-    
+
     def get_is_in_shopping_cart(self, obj):
         request = self.context.get('request')
         return Cart.objects.filter(
