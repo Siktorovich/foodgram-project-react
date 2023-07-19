@@ -1,6 +1,6 @@
 from api.views import (
-    CartDownloadPDF,
     CartView,
+    download_shopping_cart,
     FavoriteView,
     IngredientViewSet,
     RecipeViewSet,
@@ -22,7 +22,7 @@ urlpatterns = [
     path('users/subscriptions/', SubscribeList.as_view({'get': 'list'})),
     path('users/<int:user_id>/subscribe/', SubscribeView.as_view()),
     path('recipes/<int:recipe_id>/favorite/', FavoriteView.as_view()),
-    path('recipes/download_shopping_cart/', CartDownloadPDF),
+    path('recipes/download_shopping_cart/', download_shopping_cart),
     path('recipes/<int:recipe_id>/shopping_cart/', CartView.as_view()),
     path('', include(router.urls)),
 ]
