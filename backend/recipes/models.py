@@ -40,8 +40,8 @@ class Ingredient(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Ингридиент'
-        verbose_name_plural = 'Ингридиенты'
+        verbose_name = 'Ингредиент'
+        verbose_name_plural = 'Ингредиенты'
 
     def __str__(self):
         return self.name
@@ -76,7 +76,7 @@ class Recipe(models.Model):
     ingredients = models.ManyToManyField(
         Ingredient,
         through='IngredientRecipe',
-        verbose_name='Список ингридиентов',
+        verbose_name='Список ингредиентов',
         related_name='recipe'
     )
 
@@ -89,74 +89,77 @@ class Recipe(models.Model):
 
 
 class TagRecipe(models.Model):
-    tag_id = models.ForeignKey(
+    tag = models.ForeignKey(
         Tag,
         on_delete=models.CASCADE,
-        related_name='tag_recipe',
+        related_name='tag_recipes',
         verbose_name='Тег'
     )
-    recipe_id = models.ForeignKey(
+    recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        related_name='tag_recipe',
+        related_name='tag_recipes',
         verbose_name='Рецепт'
     )
 
     def __str__(self):
-        return f'{self.tag_id} {self.recipe_id}'
+        return f'{self.tag} {self.recipe}'
 
 
 class IngredientRecipe(models.Model):
-    ingredient_id = models.ForeignKey(
+    ingredient = models.ForeignKey(
         Ingredient,
         on_delete=models.CASCADE,
-        related_name='ingredient_recipe',
-        verbose_name='Ингридиент'
+        related_name='ingredient_recipes',
+        verbose_name='Ингредиент'
     )
-    recipe_id = models.ForeignKey(
+    recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        related_name='ingredient_recipe',
-        verbose_name='Рецепт'
-    )
-
-    def __str__(self):
-        return f'{self.ingredient_id} {self.recipe_id}'
-
-
-class AmountIngredientInRecipe(models.Model):
-    ingredient_id = ingredient_id = models.OneToOneField(
-        Ingredient,
-        on_delete=models.CASCADE,
-        related_name='amount_ingredient',
-        verbose_name='Ингридиент'
-    )
-    recipe_id = models.ForeignKey(
-        Recipe,
-        on_delete=models.CASCADE,
-        related_name='amount_recipe',
+        related_name='ingredient_recipes',
         verbose_name='Рецепт'
     )
     amount = models.PositiveBigIntegerField(
-        verbose_name='Количество'
+         verbose_name='Количество'
     )
 
-    class Meta:
-        verbose_name = 'Количество ингридиента'
-        verbose_name_plural = 'Количество ингридиентов'
-
     def __str__(self):
-        return self.amount
+        return f'{self.ingredient} {self.recipe}'
+
+
+# class AmountIngredientInRecipe(models.Model):
+#     ingredient_id = models.ForeignKey(
+#         Ingredient,
+#         on_delete=models.CASCADE,
+#         related_name='amount_ingredient',
+#         verbose_name='Ингридиент'
+#     )
+#     recipe_id = models.ForeignKey(
+#         Recipe,
+#         on_delete=models.CASCADE,
+#         related_name='amount_recipe',
+#         verbose_name='Рецепт'
+#     )
+#     amount = models.PositiveBigIntegerField(
+#         verbose_name='Количество'
+#     )
+
+#     class Meta:
+#         verbose_name = 'Количество ингридиента'
+#         verbose_name_plural = 'Количество ингридиентов'
+
+#     def __str__(self):
+#         return self.amount
 
 
 class Subscriber(models.Model):
-    user_id = models.ForeignKey(
+    user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name='subscriber',
         verbose_name='Подписчик'
     )
-    subscriber_id = models.ForeignKey(
+    subscriber = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name='subscribing',
@@ -164,19 +167,19 @@ class Subscriber(models.Model):
     )
 
     class Meta:
-        unique_together = ('user_id', 'subscriber_id')
+        unique_together = ('user', 'subscriber')
         verbose_name = 'Подписка'
         verbose_name_plural = 'Подписки'
 
 
 class Favorite(models.Model):
-    user_id = models.ForeignKey(
+    user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name='favorite',
         verbose_name='Подписавшийся'
     )
-    recipe_id = models.ForeignKey(
+    recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
         related_name='favorite',
@@ -184,19 +187,19 @@ class Favorite(models.Model):
     )
 
     class Meta:
-        unique_together = ('user_id', 'recipe_id')
+        unique_together = ('user', 'recipe')
         verbose_name = 'Избранное'
         verbose_name_plural = 'Список избранного'
 
 
 class Cart(models.Model):
-    user_id = models.ForeignKey(
+    user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name='cart',
         verbose_name='Покупатель'
     )
-    recipe_id = models.ForeignKey(
+    recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
         related_name='cart',
@@ -204,6 +207,6 @@ class Cart(models.Model):
     )
 
     class Meta:
-        unique_together = ('user_id', 'recipe_id')
+        unique_together = ('user', 'recipe')
         verbose_name = 'Покупка'
         verbose_name_plural = 'Список покупок'

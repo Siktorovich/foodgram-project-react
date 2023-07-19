@@ -9,7 +9,7 @@ class CreateDeleteAPIViewMixin:
 
     def post(self, request, recipe_id):
         serializer = self.serializer_view(
-            data={'user_id': request.user.id, 'recipe_id': recipe_id}
+            data={'user': request.user.id, 'recipe': recipe_id}
         )
         if serializer.is_valid():
             serializer.save()
@@ -25,8 +25,8 @@ class CreateDeleteAPIViewMixin:
     def delete(self, request, recipe_id):
         object = get_object_or_404(
            self.database_view,
-            user_id=request.user.id,
-            recipe_id=recipe_id
+            user=request.user.id,
+            recipe=recipe_id
         )
         object.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -41,7 +41,7 @@ class MixinCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = None
         fields = (
-            'user_id',
+            'user',
         )
 
     def to_representation(self, instance):

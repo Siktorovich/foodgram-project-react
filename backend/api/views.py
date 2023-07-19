@@ -52,31 +52,24 @@ class ListViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipeInitialSerializer
-    permission_classes = (OwnerSuperUserOrReadOnly,)
+    permission_classes = (permissions.AllowAny,)
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
-
-    # def perform_update(self, serializer):
-    #     if serializer.instance.author != self.request.user:
-    #         raise exceptions.PermissionDenied('You are not author of this recipe')
-    #     super(RecipeViewSet, self).perform_update(serializer)
-
-    # def perform_destroy(self, instance):
-    #     if instance.author != self.request.user:
-    #         raise exceptions.PermissionDenied('You are not author of this recipe')
-    #     super(RecipeViewSet, self).perform_destroy(instance)
-
+    
     def get_serializer_class(self):
         if self.action in ['list', 'retrieve']:
             return RecipeRepresentSerializer
         return RecipeInitialSerializer
+    
+    def get_queryset(self):
+        return super().get_queryset().prefetch_related('ingredient_recipes')
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
-    permission_classes = (permissions.AllowAny,)
+    permission_classes = (OwnerSuperUserOrReadOnly,)
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
@@ -89,7 +82,7 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
 class SubscribeView(views.APIView):
     def post(self, request, user_id):
         serializer = SubscribeUserSerializer(
-            data={'user_id': request.user.id, 'subscriber_id': user_id}
+            data={'user': request.user.id, 'subscriber': user_id}
         )
         if serializer.is_valid():
             serializer.save()
@@ -105,8 +98,8 @@ class SubscribeView(views.APIView):
     def delete(self, request, user_id):
         subscribe = get_object_or_404(
             Subscriber,
-            user_id=request.user.id,
-            subscriber_id=user_id
+            user=request.user.id,
+            subscriber=user_id
         )
         subscribe.delete()
         return response.Response(status=status.HTTP_204_NO_CONTENT)
@@ -116,7 +109,7 @@ class SubscribeList(ListViewSet):
     serializer_class = SubscribeSerializer
 
     def get_queryset(self):
-        return Subscriber.objects.filter(user_id=self.request.user)
+        return Subscriber.objects.filter(user=self.request.user)
 
 
 class FavoriteView(CreateDeleteAPIViewMixin, views.APIView):
@@ -141,15 +134,15 @@ def download_shopping_cart(request):
         size=16
     )
     ingredients = IngredientRecipe.objects.filter(
-        recipe_id__cart__user_id=request.user
+        recipe__cart__user=request.user
     ).values(
-        'ingredient_id__name',
-        'ingredient_id__measurement_unit',
+        'ingredient__name',
+        'ingredient__measurement_unit',
     ).annotate(amount=Sum('amount')).order_by()
 
     for ingredient in ingredients:
-        name = ingredient['ingredient_id__name']
-        measurement_unit = ingredient['ingredient_id__measurement_unit']
+        name = ingredient['ingredient__name']
+        measurement_unit = ingredient['ingredient__measurement_unit']
         amount = ingredient['amount']
         line = f'{name} {amount} {measurement_unit}'
         text.textLine(line)
