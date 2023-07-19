@@ -15,6 +15,13 @@ class User(AbstractUser):
         verbose_name='Роль пользователя',
     )
 
+    REQUIRED_FIELDS = [
+        'first_name',
+        'last_name',
+        'email',
+        'password',
+    ]
+
     class Meta:
         db_table = 'auth_user'
         verbose_name = 'Пользователь'
