@@ -3,7 +3,6 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -111,10 +110,26 @@ REST_FRAMEWORK = {
 }
 
 DJOSER = {
-    "LOGIN_FIELD": "email",
-    "SERIALIZERS": {
+    'HIDE_USERS': False,
+    'LOGIN_FIELD': 'email',
+    'SERIALIZERS': {
         'user': 'users.serializers.UserSerializer',
         'user_create': 'users.serializers.UserCreateSerializer',
         'current_user': 'users.serializers.UserSerializer',
+    },
+    'PERMISSIONS': {
+        'activation': ['users.permissions.SuperUserOrAdmin'],
+        'password_reset': ['users.permissions.SuperUserOrAdmin'],
+        'password_reset_confirm': ['users.permissions.SuperUserOrAdmin'],
+        'set_password': ['users.permissions.CurrentUserOrAdmin'],
+        'username_reset': ['users.permissions.SuperUserOrAdmin'],
+        'username_reset_confirm': ['users.permissions.SuperUserOrAdmin'],
+        'set_username': ['users.permissions.SuperUserOrAdmin'],
+        'user_create': ['rest_framework.permissions.AllowAny'],
+        'user_delete': ['users.permissions.CurrentUserOrAdmin'],
+        'user': ['users.permissions.CurrentUserOrAdmin'],
+        'user_list': ['rest_framework.permissions.AllowAny'],
+        'token_create': ['rest_framework.permissions.AllowAny'],
+        'token_destroy': ['users.permissions.CurrentUserOrAdmin'],
     }
 }
