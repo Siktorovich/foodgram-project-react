@@ -12,7 +12,7 @@ from recipes.models import (
 from users.models import Subscriber
 from users.serializers import UserSerializer
 
-from rest_framework import serializers
+from rest_framework import exceptions, serializers
 
 
 class RecipeSubscribeSerializer(serializers.ModelSerializer):
@@ -262,6 +262,82 @@ class RecipeInitialSerializer(serializers.ModelSerializer):
                 tag=current_tag, recipe=recipe
             )
         return recipe
+
+    def update(self, instance, validated_data):
+        print(self.initial_data)
+        print(validated_data)
+        ingredients =  validated_data.pop('ingredients')
+        tags = validated_data.pop('tags')
+
+        recipe = Recipe.objects.get(id=instance.id)
+        if len(ingredients) > 0:
+            IngredientRecipe.objects.filter(recipe=instance.id).delete()
+            for ingredient in ingredients:
+                current_ingredient = Ingredient.objects.get(
+                    id=IngredientCreateRecipe(ingredient).data['id'],
+                )
+                IngredientRecipe.objects.create(
+                    ingredient=current_ingredient,
+                    recipe=recipe, 
+                    amount=IngredientCreateRecipe(ingredient).data['amount']
+                )
+        if len(tags) > 0:
+            TagRecipe.objects.filter(recipe=instance.id).delete()
+            for tag in tags:
+                current_tag = Tag.objects.get(pk=tag.id)
+                TagRecipe.objects.create(
+                    tag=current_tag, recipe=recipe
+                )
+
+        return super().update(instance, validated_data)
+
+    def validate_name(self, value):
+        if Recipe.objects.filter(name=value).exists():
+            raise exceptions.ValidationError(
+                consts.UNIQUE_NAME_RECIPE + value
+            )
+        return value
+
+    def validate_ingredients(self, value):
+        if len(value) <= 0:
+            raise exceptions.ValidationError(
+                consts.EMPTY_LIST_INGREDIENTS
+            )
+        unique_ids_ingredients = []
+        for ingredient in value:
+            if IngredientCreateRecipe(ingredient).data['id'] in unique_ids_ingredients:
+                raise exceptions.ValidationError(
+                    consts.DUBLICATED_RECIPE_INGREDIENTS
+                )
+            unique_ids_ingredients.append(
+                IngredientCreateRecipe(ingredient).data['id']
+            )
+            if int(IngredientCreateRecipe(ingredient).data['amount']) <= 0:
+                raise exceptions.ValidationError(
+                    consts.MIN_VALUE_FOR_AMOUNT
+                )
+        return value
+
+    def validate_tags(self, value):
+        if len(value) <= 0:
+            raise exceptions.ValidationError(
+                consts.EMPTY_LIST_TAGS
+            )
+        unique_ids_tags = []
+        for tag in value:
+            if tag.id in unique_ids_tags:
+                raise exceptions.ValidationError(
+                    consts.DUBLICATED_RECIPE_TAGS
+                )
+            unique_ids_tags.append(tag.id)
+        return value
+
+    def validate_cooking_time(self, value):
+        if value <= 0:
+            raise exceptions.ValidationError(
+                consts.MIN_VALUE_FOR_COOKING_TIME
+            )
+        return value
     
     def to_representation(self, instance):
         request = self.context.get('request')

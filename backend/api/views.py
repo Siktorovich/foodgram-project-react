@@ -50,10 +50,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipeInitialSerializer
     permission_classes = (permissions.AllowAny,)
+    http_method_names = (
+        'get', 'post', 'patch', 'delete', 'retrieve', 'options'
+    )
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
-    
+
     def get_serializer_class(self):
         if self.action in ['list', 'retrieve']:
             return RecipeRepresentSerializer
@@ -139,11 +142,11 @@ def download_shopping_cart(request):
         'ingredient__measurement_unit',
     ).annotate(amount=Sum('amount')).order_by()
 
-    for ingredient in ingredients:
+    for index, ingredient in enumerate(ingredients):
         name = ingredient['ingredient__name']
         measurement_unit = ingredient['ingredient__measurement_unit']
         amount = ingredient['amount']
-        line = f'{name} {amount} {measurement_unit}'
+        line = f'{index+1}. {name} {amount} {measurement_unit}'
         text.textLine(line)
     
     my_canvas.drawText(text)
