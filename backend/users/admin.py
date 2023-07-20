@@ -3,6 +3,7 @@ from django.contrib import admin
 from users.models import User, Subscriber
 
 
+@admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     list_display = (
         'pk',
@@ -14,16 +15,13 @@ class UserAdmin(admin.ModelAdmin):
     )
     list_filter = (
         'email',
-        'name',
+        'first_name',
     )
 
 
+@admin.register(Subscriber)
 class SubscriberAdmin(admin.ModelAdmin):
     list_display = (
         'user',
         'subscriber',
     )
-
-
-admin.register(User, UserAdmin)
-admin.register(Subscriber, SubscriberAdmin)
