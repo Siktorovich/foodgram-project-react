@@ -124,8 +124,7 @@ class CartView(CreateDeleteAPIViewMixin, views.APIView):
     database_view = Cart
 
 
-@decorators.api_view(['GET'])
-def download_shopping_cart(request):
+def creating_pdf_list(ingredients):
     buffer = io.BytesIO()
     pdfmetrics.registerFont(ttfonts.TTFont('Arial', 'static/arial.ttf'))
     my_canvas = canvas.Canvas(buffer, pagesize=letter, bottomup=0)
@@ -135,20 +134,14 @@ def download_shopping_cart(request):
         psfontname='Arial',
         size=16
     )
-    ingredients = IngredientRecipe.objects.filter(
-        recipe__cart__user=request.user
-    ).values(
-        'ingredient__name',
-        'ingredient__measurement_unit',
-    ).annotate(amount=Sum('amount')).order_by()
 
     for index, ingredient in enumerate(ingredients):
         name = ingredient['ingredient__name']
         measurement_unit = ingredient['ingredient__measurement_unit']
         amount = ingredient['amount']
-        line = f'{index+1}. {name} {amount} {measurement_unit}'
-        text.textLine(line)
-    
+        line = f'{index+1}. {name.title()} ({measurement_unit}) - {amount}'
+
+    text.textLine(line)
     my_canvas.drawText(text)
     my_canvas.showPage()
     my_canvas.save()
@@ -159,3 +152,16 @@ def download_shopping_cart(request):
         filename='your_shop_list.pdf',
         content_type='application/pdf',
     )
+
+
+@decorators.api_view(['GET'])
+def download_shopping_cart(request):
+    
+    ingredients = IngredientRecipe.objects.filter(
+        recipe__cart__user=request.user
+    ).values(
+        'ingredient__name',
+        'ingredient__measurement_unit',
+    ).annotate(amount=Sum('amount')).order_by()
+
+    return creating_pdf_list(ingredients)

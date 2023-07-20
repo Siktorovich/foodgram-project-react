@@ -12,12 +12,12 @@ class Tag(models.Model):
 
     name = models.CharField(
         max_length=200,
+        unique=True,
         verbose_name='Название'
     )
     color = models.CharField(
         max_length=7,
-        null=True,
-        blank=True,
+        unique=True,
         verbose_name='Цвет в HEX',
         validators=[
             validators.RegexValidator(
@@ -27,8 +27,7 @@ class Tag(models.Model):
     )
     slug = models.SlugField(
         max_length=200,
-        null=True,
-        blank=True,
+        unique=True,
         verbose_name='Уникальный слаг'
     )
 
@@ -95,6 +94,7 @@ class Recipe(models.Model):
     tags = models.ManyToManyField(
         Tag,
         through='TagRecipe',
+        related_name='recipe',
         verbose_name='Список тегов'
     )
     image = models.ImageField(
@@ -104,13 +104,20 @@ class Recipe(models.Model):
     ingredients = models.ManyToManyField(
         Ingredient,
         through='IngredientRecipe',
+        related_name='recipe',
         verbose_name='Список ингредиентов',
-        related_name='recipe'
+    )
+
+    pub_date = models.DateTimeField(
+        auto_now_add=True,
+        editable=False,
+        verbose_name='Дата публикации'
     )
 
     class Meta:
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
+        ordering = ('-pub_date',)
         constraints = (
             models.UniqueConstraint(
                 fields=('author', 'name'),
@@ -148,7 +155,7 @@ class TagRecipe(models.Model):
 
 
 class IngredientRecipe(models.Model):
-    """Таблица связи ингрдиента и рецепта и количество ингридиентов"""
+    """Таблица связи ингрдиента и рецепта и количество ингредиентов"""
 
     ingredient = models.ForeignKey(
         Ingredient,
@@ -174,8 +181,8 @@ class IngredientRecipe(models.Model):
 
     class Meta:
         unique_together = ('ingredient', 'recipe')
-        verbose_name = 'Количество ингридиента в рецепте'
-        verbose_name_plural = 'Количество ингридиентов в рецептах'
+        verbose_name = 'Количество ингрeдиента в рецепте'
+        verbose_name_plural = 'Количество ингрeдиентов в рецептах'
 
     def __str__(self):
         return f'{self.ingredient} {self.recipe}'
