@@ -1,4 +1,4 @@
-from recipes.models import Subscriber
+from users.models import Subscriber
 
 from django.contrib.auth.hashers import make_password
 

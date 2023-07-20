@@ -5,9 +5,7 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter, inch
 
 from api.permissions import OwnerSuperUserOrReadOnly
-from api.mixins import (
-    CreateDeleteAPIViewMixin
-)
+from api.mixins import CreateDeleteAPIViewMixin
 from api.serializers import (
     CartCreateSerializer,
     FavoriteCreateSerializer,
@@ -29,13 +27,12 @@ from recipes.models import (
     Ingredient,
     IngredientRecipe,
     Recipe,
-    Subscriber,
     Tag,
 )
+from users.models import Subscriber
 
 from rest_framework import (
     decorators,
-    exceptions,
     mixins,
     permissions,
     response,
@@ -63,7 +60,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return RecipeInitialSerializer
     
     def get_queryset(self):
-        return super().get_queryset().prefetch_related('ingredient_recipes')
+        return super().get_queryset().prefetch_related(
+            'ingredient_recipes'
+        )
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):

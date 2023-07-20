@@ -127,7 +127,7 @@ DJOSER = {
         'set_username': ['users.permissions.SuperUserOrAdmin'],
         'user_create': ['rest_framework.permissions.AllowAny'],
         'user_delete': ['users.permissions.CurrentUserOrAdmin'],
-        'user': ['users.permissions.CurrentUserOrAdmin'],
+        'user': ['djoser.permissions.CurrentUserOrAdminOrReadOnly'],
         'user_list': ['rest_framework.permissions.AllowAny'],
         'token_create': ['rest_framework.permissions.AllowAny'],
         'token_destroy': ['users.permissions.CurrentUserOrAdmin'],

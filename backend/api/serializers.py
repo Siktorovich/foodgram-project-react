@@ -1,16 +1,18 @@
 from api.fields import Base64ImageField, Hex2NameColor
+from recipes import consts
 from recipes.models import (
     Cart,
     Favorite,
     Ingredient,
     IngredientRecipe,
     Recipe,
-    Subscriber,
     Tag,
     TagRecipe
 )
-from rest_framework import serializers
+from users.models import Subscriber
 from users.serializers import UserSerializer
+
+from rest_framework import serializers
 
 
 class RecipeSubscribeSerializer(serializers.ModelSerializer):
@@ -124,7 +126,7 @@ class SubscribeUserSerializer(BaseCreateSerializer):
     def validate(self, data):
         if data.get('user') == data.get('subscriber'):
             raise serializers.ValidationError(
-                'You can not subscribe on yourself.'
+                consts.SUBSCRIBE_ON_YOURSELF_ERROR
             )
         return data
 
@@ -173,7 +175,10 @@ class IngredientSerializer(serializers.ModelSerializer):
 class RecipeRepresentSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True)
     author = UserSerializer()
-    ingredients = IngredientWithAmountSerializer(many=True, source='ingredient_recipes')
+    ingredients = IngredientWithAmountSerializer(
+        many=True,
+        source='ingredient_recipes'
+    )
     is_in_shopping_cart = serializers.SerializerMethodField()
     is_favorited = serializers.SerializerMethodField()
     image = Base64ImageField()
@@ -263,17 +268,3 @@ class RecipeInitialSerializer(serializers.ModelSerializer):
         return RecipeRepresentSerializer(
             instance, context={'request': request}
         ).data
-
-    def validate(self, data):
-        print(data)
-    # сделать валидацию на время приготовления
-    # if int(ingredient['amount']) < 1:
-    #             raise serializers.ValidationError(
-    #                 'Amount can be less than 1'
-    #             )
-
-    #         if data.get('user') == data.get('subscriber'):
-    #         raise serializers.ValidationError(
-    #             'You can not subscribe on yourself.'
-            # )
-        return data
