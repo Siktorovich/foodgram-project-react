@@ -1,11 +1,6 @@
-import io
-
-from reportlab.pdfbase import pdfmetrics, ttfonts
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import letter, inch
-
-from api.permissions import OwnerSuperUserOrReadOnly
+from api.filters import RecipeFilter
 from api.mixins import CreateDeleteAPIViewMixin
+from api.permissions import OwnerSuperUserOrReadOnly
 from api.serializers import (
     CartCreateSerializer,
     FavoriteCreateSerializer,
@@ -16,10 +11,10 @@ from api.serializers import (
     SubscribeUserSerializer,
     TagSerializer
 )
+from api.utils import creating_pdf_list
 
 from django.db.models import Sum
 from django.shortcuts import get_object_or_404
-from django.http import FileResponse
 
 from recipes.models import (
     Cart,
@@ -29,7 +24,6 @@ from recipes.models import (
     Recipe,
     Tag,
 )
-from users.models import Subscriber
 
 from rest_framework import (
     decorators,
@@ -41,18 +35,23 @@ from rest_framework import (
     viewsets
 )
 
+from users.models import Subscriber
+
 
 class ListViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     pass
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
+    """Viewset for recipes endpoint"""
+
     queryset = Recipe.objects.all()
     serializer_class = RecipeInitialSerializer
     permission_classes = (permissions.AllowAny,)
     http_method_names = (
         'get', 'post', 'patch', 'delete', 'retrieve', 'options'
     )
+    filterset_class = RecipeFilter
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -61,7 +60,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if self.action in ['list', 'retrieve']:
             return RecipeRepresentSerializer
         return RecipeInitialSerializer
-    
+
     def get_queryset(self):
         return super().get_queryset().prefetch_related(
             'ingredient_recipes'
@@ -69,6 +68,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
+    """Viewset for tags endpoint"""
+
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     permission_classes = (OwnerSuperUserOrReadOnly,)
@@ -76,6 +77,8 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
+    """Viewset for ingredients endpoint"""
+
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
@@ -83,6 +86,8 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class SubscribeView(views.APIView):
+    """View functions for subscribe endpoint"""
+
     def post(self, request, user_id):
         serializer = SubscribeUserSerializer(
             data={'user': request.user.id, 'subscriber': user_id}
@@ -116,48 +121,23 @@ class SubscribeList(ListViewSet):
 
 
 class FavoriteView(CreateDeleteAPIViewMixin, views.APIView):
+    """View class for favorite endpoint"""
+
     serializer_view = FavoriteCreateSerializer
     database_view = Favorite
 
 
 class CartView(CreateDeleteAPIViewMixin, views.APIView):
+    """View class for shopping_cart endpoint"""
+
     serializer_view = CartCreateSerializer
     database_view = Cart
 
 
-def creating_pdf_list(ingredients):
-    buffer = io.BytesIO()
-    pdfmetrics.registerFont(ttfonts.TTFont('Arial', 'static/arial.ttf'))
-    my_canvas = canvas.Canvas(buffer, pagesize=letter, bottomup=0)
-    text = my_canvas.beginText()
-    text.setTextOrigin(inch, inch)
-    text.setFont(
-        psfontname='Arial',
-        size=16
-    )
-
-    for index, ingredient in enumerate(ingredients):
-        name = ingredient['ingredient__name']
-        measurement_unit = ingredient['ingredient__measurement_unit']
-        amount = ingredient['amount']
-        line = f'{index+1}. {name.title()} ({measurement_unit}) - {amount}'
-
-    text.textLine(line)
-    my_canvas.drawText(text)
-    my_canvas.showPage()
-    my_canvas.save()
-    buffer.seek(0)
-    return FileResponse(
-        buffer,
-        as_attachment=True,
-        filename='your_shop_list.pdf',
-        content_type='application/pdf',
-    )
-
-
 @decorators.api_view(['GET'])
 def download_shopping_cart(request):
-    
+    """View function for downloading shopping cart endpoint"""
+
     ingredients = IngredientRecipe.objects.filter(
         recipe__cart__user=request.user
     ).values(

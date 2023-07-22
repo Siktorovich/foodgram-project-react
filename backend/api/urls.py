@@ -1,12 +1,12 @@
 from api.views import (
     CartView,
-    download_shopping_cart,
     FavoriteView,
     IngredientViewSet,
     RecipeViewSet,
     SubscribeList,
     SubscribeView,
-    TagViewSet
+    TagViewSet,
+    download_shopping_cart,
 )
 
 from django.urls import include, path

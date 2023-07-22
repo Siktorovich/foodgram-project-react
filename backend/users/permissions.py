@@ -12,7 +12,7 @@ class CurrentUserOrAdmin(permissions.BasePermission):
             or request.user.is_superuser
             or request.user.role == 'admin'
         )
-    
+
 
 class SuperUserOrAdmin(permissions.BasePermission):
 

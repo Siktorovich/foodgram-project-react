@@ -1,9 +1,10 @@
 import base64
-import webcolors
+
+from django.core.files.base import ContentFile
 
 from rest_framework import serializers
 
-from django.core.files.base import ContentFile
+import webcolors
 
 
 class Hex2NameColor(serializers.Field):

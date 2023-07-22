@@ -1,10 +1,8 @@
-from users.models import Subscriber
-
 from django.contrib.auth.hashers import make_password
 
 from rest_framework import serializers
 
-from users.models import User
+from users.models import Subscriber, User
 
 
 class UserCreateSerializer(serializers.HyperlinkedModelSerializer):
@@ -25,7 +23,9 @@ class UserCreateSerializer(serializers.HyperlinkedModelSerializer):
         )
 
     def create(self, validated_data):
-        validated_data['password'] = make_password(validated_data.get('password'))
+        validated_data['password'] = make_password(
+            validated_data.get('password')
+        )
         return super(UserCreateSerializer, self).create(validated_data)
 
 

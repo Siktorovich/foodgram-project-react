@@ -1,10 +1,9 @@
+from django.core import validators
 from django.db import models
 
-from users.models import User
-
-from django.core import validators
-
 from recipes import consts
+
+from users.models import User
 
 
 class Tag(models.Model):
@@ -94,7 +93,7 @@ class Recipe(models.Model):
     tags = models.ManyToManyField(
         Tag,
         through='TagRecipe',
-        related_name='recipe',
+        related_name='recipes',
         verbose_name='Список тегов'
     )
     image = models.ImageField(
@@ -170,13 +169,13 @@ class IngredientRecipe(models.Model):
         verbose_name='Рецепт'
     )
     amount = models.PositiveSmallIntegerField(
-         verbose_name='Количество',
-         validators=[
+        verbose_name='Количество',
+        validators=[
             validators.MinValueValidator(
                 consts.MIN_VALUE_FOR_AMOUNT,
                 message=consts.MIN_VALUE_FOR_AMOUNT
             )
-         ]
+        ]
     )
 
     class Meta:

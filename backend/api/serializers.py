@@ -1,4 +1,5 @@
 from api.fields import Base64ImageField, Hex2NameColor
+
 from recipes import consts
 from recipes.models import (
     Cart,
@@ -9,10 +10,11 @@ from recipes.models import (
     Tag,
     TagRecipe
 )
-from users.models import Subscriber
-from users.serializers import UserSerializer
 
 from rest_framework import exceptions, serializers
+
+from users.models import Subscriber
+from users.serializers import UserSerializer
 
 
 class RecipeSubscribeSerializer(serializers.ModelSerializer):
@@ -216,6 +218,7 @@ class RecipeRepresentSerializer(serializers.ModelSerializer):
 class IngredientCreateRecipe(serializers.ModelSerializer):
     id = serializers.PrimaryKeyRelatedField(
         source='ingredient', queryset=Ingredient.objects.all())
+
     class Meta:
         model = IngredientRecipe
         fields = (
@@ -228,7 +231,7 @@ class RecipeInitialSerializer(serializers.ModelSerializer):
     image = Base64ImageField()
     ingredients = IngredientCreateRecipe(many=True)
     tags = serializers.PrimaryKeyRelatedField(
-       many=True, queryset=Tag.objects.all()
+        many=True, queryset=Tag.objects.all()
     )
 
     class Meta:
@@ -243,7 +246,7 @@ class RecipeInitialSerializer(serializers.ModelSerializer):
         )
 
     def create(self, validated_data):
-        ingredients =  validated_data.pop('ingredients')
+        ingredients = validated_data.pop('ingredients')
         tags = validated_data.pop('tags')
         recipe = Recipe.objects.create(**validated_data)
 
@@ -253,7 +256,7 @@ class RecipeInitialSerializer(serializers.ModelSerializer):
             )
             IngredientRecipe.objects.create(
                 ingredient=current_ingredient,
-                recipe=recipe, 
+                recipe=recipe,
                 amount=IngredientCreateRecipe(ingredient).data['amount']
             )
         for tag in tags:
@@ -266,7 +269,7 @@ class RecipeInitialSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         print(self.initial_data)
         print(validated_data)
-        ingredients =  validated_data.pop('ingredients')
+        ingredients = validated_data.pop('ingredients')
         tags = validated_data.pop('tags')
 
         recipe = Recipe.objects.get(id=instance.id)
@@ -278,7 +281,7 @@ class RecipeInitialSerializer(serializers.ModelSerializer):
                 )
                 IngredientRecipe.objects.create(
                     ingredient=current_ingredient,
-                    recipe=recipe, 
+                    recipe=recipe,
                     amount=IngredientCreateRecipe(ingredient).data['amount']
                 )
         if len(tags) > 0:
@@ -305,7 +308,9 @@ class RecipeInitialSerializer(serializers.ModelSerializer):
             )
         unique_ids_ingredients = []
         for ingredient in value:
-            if IngredientCreateRecipe(ingredient).data['id'] in unique_ids_ingredients:
+            if IngredientCreateRecipe(
+                ingredient
+            ).data['id'] in unique_ids_ingredients:
                 raise exceptions.ValidationError(
                     consts.DUBLICATED_RECIPE_INGREDIENTS
                 )
@@ -338,7 +343,7 @@ class RecipeInitialSerializer(serializers.ModelSerializer):
                 consts.MIN_VALUE_FOR_COOKING_TIME
             )
         return value
-    
+
     def to_representation(self, instance):
         request = self.context.get('request')
         return RecipeRepresentSerializer(

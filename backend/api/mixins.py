@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import serializers, status
 from rest_framework.response import Response
 
+
 class CreateDeleteAPIViewMixin:
     serializer_view = None
     database_view = None
@@ -24,7 +25,7 @@ class CreateDeleteAPIViewMixin:
 
     def delete(self, request, recipe_id):
         object = get_object_or_404(
-           self.database_view,
+            self.database_view,
             user=request.user.id,
             recipe=recipe_id
         )

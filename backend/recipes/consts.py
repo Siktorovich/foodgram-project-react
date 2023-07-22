@@ -9,7 +9,7 @@ INGREDIENT_CONSTRAINT_NAME = 'unique_ingredient'
 # Subscribe model
 SUBSCRIBE_ON_YOURSELF_ERROR = 'You can not subscribe on yourself'
 
-# Recipe model 
+# Recipe model
 COOKING_TIME_ERROR = 'Cooking time can not be less than 1'
 DUBLICATED_RECIPE_INGREDIENTS = 'There is dublicated ingredients in recipe'
 DUBLICATED_RECIPE_TAGS = 'There is dublicated tags in recipe'
