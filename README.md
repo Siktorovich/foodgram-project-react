@@ -5,7 +5,7 @@
 [![drf version](https://img.shields.io/static/v1?label=DRF&message=3.12.4&color=97ca00&style=for-the-badge)](https://www.django-rest-framework.org/)
 ![api version](https://img.shields.io/static/v1?label=API%20VERSION&message=1.0.0&color=77ca00&style=for-the-badge)
 
-#About project
+# About project
 The project is a site Foodgram (or your personal "Product assistant")
 You can publicate recipes, subscribe on publications other users, add recipes that you like in favorites and download list of ingredients that you put in your cart
 
