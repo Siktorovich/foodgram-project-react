@@ -1,42 +1,19 @@
+from django.db.models import Sum
+from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import (decorators, mixins, permissions, response, status,
+                            views, viewsets)
+
 from api.filters import RecipeFilter
 from api.mixins import CreateDeleteAPIViewMixin
 from api.permissions import OwnerSuperUserOrReadOnly
-from api.serializers import (
-    CartCreateSerializer,
-    FavoriteCreateSerializer,
-    IngredientSerializer,
-    RecipeInitialSerializer,
-    RecipeRepresentSerializer,
-    SubscribeSerializer,
-    SubscribeUserSerializer,
-    TagSerializer
-)
+from api.serializers import (CartCreateSerializer, FavoriteCreateSerializer,
+                             IngredientSerializer, RecipeInitialSerializer,
+                             RecipeRepresentSerializer, SubscribeSerializer,
+                             SubscribeUserSerializer, TagSerializer)
 from api.utils import creating_pdf_list, query_validation
-
-from django.db.models import Sum
-from django.shortcuts import get_object_or_404
-
-from django_filters.rest_framework import DjangoFilterBackend
-
-from recipes.models import (
-    Cart,
-    Favorite,
-    Ingredient,
-    IngredientRecipe,
-    Recipe,
-    Tag,
-)
-
-from rest_framework import (
-    decorators,
-    mixins,
-    permissions,
-    response,
-    status,
-    views,
-    viewsets
-)
-
+from recipes.models import (Cart, Favorite, Ingredient, IngredientRecipe,
+                            Recipe, Tag)
 from users.models import Subscriber
 
 
@@ -44,15 +21,21 @@ class ListViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     pass
 
 
-class RecipeViewSet(viewsets.ModelViewSet):
-    """Viewset for recipes endpoint"""
+class CreateUpdateRetrieveDestroyListSet(
+    mixins.CreateModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.DestroyModelMixin,
+    ListViewSet
+):
+    pass
 
+
+class RecipeViewSet(CreateUpdateRetrieveDestroyListSet):
+    """Viewset for recipes endpoint."""
     queryset = Recipe.objects.all()
     serializer_class = RecipeInitialSerializer
     permission_classes = (permissions.AllowAny,)
-    http_method_names = (
-        'get', 'post', 'patch', 'delete', 'retrieve', 'options'
-    )
     filterset_class = RecipeFilter
 
     def perform_create(self, serializer):
@@ -70,8 +53,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
-    """Viewset for tags endpoint"""
-
+    """Viewset for tags endpoint."""
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     permission_classes = (OwnerSuperUserOrReadOnly,)
@@ -79,8 +61,7 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
-    """Viewset for ingredients endpoint"""
-
+    """Viewset for ingredients endpoint."""
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
@@ -90,8 +71,7 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class SubscribeView(views.APIView):
-    """View functions for subscribe endpoint"""
-
+    """View functions for subscribe endpoint."""
     def post(self, request, user_id):
         recipes_limit = request.query_params.get('recipes_limit')
         if recipes_limit is not None:
@@ -104,15 +84,11 @@ class SubscribeView(views.APIView):
             serializer = SubscribeUserSerializer(
                 data={'user': request.user.id, 'subscriber': user_id}
             )
-        if serializer.is_valid():
-            serializer.save()
-            return response.Response(
-                data=serializer.data,
-                status=status.HTTP_201_CREATED
-            )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
         return response.Response(
-            data=serializer.errors,
-            status=status.HTTP_400_BAD_REQUEST
+            data=serializer.data,
+            status=status.HTTP_201_CREATED
         )
 
     def delete(self, request, user_id):
@@ -126,8 +102,7 @@ class SubscribeView(views.APIView):
 
 
 class SubscribeList(ListViewSet):
-    """View class for subscriptions list"""
-
+    """View class for subscriptions list."""
     serializer_class = SubscribeSerializer
 
     def get_queryset(self):
@@ -146,23 +121,20 @@ class SubscribeList(ListViewSet):
 
 
 class FavoriteView(CreateDeleteAPIViewMixin, views.APIView):
-    """View class for favorite endpoint"""
-
+    """View class for favorite endpoint."""
     serializer_view = FavoriteCreateSerializer
     database_view = Favorite
 
 
 class CartView(CreateDeleteAPIViewMixin, views.APIView):
-    """View class for shopping_cart endpoint"""
-
+    """View class for shopping_cart endpoint."""
     serializer_view = CartCreateSerializer
     database_view = Cart
 
 
 @decorators.api_view(['GET'])
 def download_shopping_cart(request):
-    """View function for downloading shopping cart endpoint"""
-
+    """View function for downloading shopping cart endpoint."""
     ingredients = IngredientRecipe.objects.filter(
         recipe__cart__user=request.user
     ).values(

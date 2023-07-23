@@ -2,7 +2,9 @@ from rest_framework import permissions
 
 
 class OwnerSuperUserOrReadOnly(permissions.BasePermission):
-
+    """Permission class that allows to endpoint only
+    owner or superuser users.
+    """
     def has_permission(self, request, view):
         return (
             request.method in permissions.SAFE_METHODS
@@ -14,5 +16,5 @@ class OwnerSuperUserOrReadOnly(permissions.BasePermission):
             request.method in permissions.SAFE_METHODS
             or obj.owner == request.user
             or request.user.is_superuser
-            or request.user.role == 'admin'
+            or request.user.check_is_admin
         )

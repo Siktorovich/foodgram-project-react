@@ -4,8 +4,7 @@ from recipes.models import Recipe
 
 
 class RecipeFilter(FilterSet):
-    """Filter for Recipe"""
-
+    """Filter for recipes endpoint."""
     is_favorited = filters.BooleanFilter(
         method='filter_is_favorited',
         field_name='is_favorited'
@@ -14,7 +13,6 @@ class RecipeFilter(FilterSet):
         method='filter_is_in_shopping_cart',
         field_name='is_in_shopping_cart'
     )
-    author = filters.NumberFilter(field_name='author')
     tags = filters.AllValuesMultipleFilter(field_name='tags__slug')
 
     def filter_is_favorited(self, queryset, name, value):

@@ -4,6 +4,10 @@ MIN_VALUE_FOR_AMOUNT = 1
 
 RECIPE_CONSTRAINT_NAME = 'unique_recipe'
 INGREDIENT_CONSTRAINT_NAME = 'unique_ingredient'
+TAG_RECIPE_CONSTRAINT_NAME = 'unique_tag_for_recipe'
+INGREDIENT_RECIPE_CONSTRAINT_NAME = 'unique_ingredient_in_recipe'
+FAVORITE_CONSTRAINT_NAME = 'unique_favorite'
+CART_CONSTRAINT_NAME = 'unique_cart'
 
 # Errors message
 # Subscribe model
@@ -22,3 +26,7 @@ AMOUNT_ERROR = 'Amount can not be less than 1'
 
 # Regexs
 REGEX_COLOR_FIELD = r'^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$'
+
+# Pagination
+PAGE_SIZE = 6
+MAX_PAGE_SIZE = 50

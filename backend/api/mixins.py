@@ -1,26 +1,22 @@
 from django.shortcuts import get_object_or_404
-
 from rest_framework import serializers, status
 from rest_framework.response import Response
 
 
 class CreateDeleteAPIViewMixin:
-    serializer_view = None
-    database_view = None
+    """Mixin for endpoints that create and delete instances."""
+    serializer_class = None
+    model_name = None
 
     def post(self, request, recipe_id):
         serializer = self.serializer_view(
             data={'user': request.user.id, 'recipe': recipe_id}
         )
-        if serializer.is_valid():
-            serializer.save()
-            return Response(
-                data=serializer.data,
-                status=status.HTTP_201_CREATED
-            )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
         return Response(
-            serializer.errors,
-            status=status.HTTP_400_BAD_REQUEST
+            data=serializer.data,
+            status=status.HTTP_201_CREATED
         )
 
     def delete(self, request, recipe_id):
@@ -34,7 +30,9 @@ class CreateDeleteAPIViewMixin:
 
 
 class MixinCreateSerializer(serializers.ModelSerializer):
-
+    """Mixin serializer that create instances in models and
+        use for representation other serializer.
+    """
     def __init__(self):
         self.serializer = None
         super(MixinCreateSerializer).__init__()

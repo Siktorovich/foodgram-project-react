@@ -1,23 +1,17 @@
-from api.fields import Base64ImageField, Hex2NameColor
-
-from recipes import consts
-from recipes.models import (
-    Cart,
-    Favorite,
-    Ingredient,
-    IngredientRecipe,
-    Recipe,
-    Tag,
-    TagRecipe
-)
-
 from rest_framework import exceptions, serializers
 
+from api.fields import Base64ImageField, Hex2NameColor
+from api.utils import (create_update_fk_recipe_instance,
+                       get_recipes_with_limit, get_validated_ingredients_tags)
+from recipes import consts
+from recipes.models import (Cart, Favorite, Ingredient, IngredientRecipe,
+                            Recipe, Tag)
 from users.models import Subscriber
 from users.serializers import UserSerializer
 
 
 class RecipeSubscribeSerializer(serializers.ModelSerializer):
+    """Serializer representing Recipe instances in subcribes endpoint."""
     class Meta:
         model = Recipe
         fields = (
@@ -29,6 +23,9 @@ class RecipeSubscribeSerializer(serializers.ModelSerializer):
 
 
 class BaseRepresentSerializer(RecipeSubscribeSerializer):
+    """The parent class for representing Recipe instances
+    that uses related names.
+    """
     id = serializers.ReadOnlyField(source='recipe.id')
     name = serializers.ReadOnlyField(source='recipe.name')
     image = Base64ImageField(source='recipe.image')
@@ -39,6 +36,9 @@ class BaseRepresentSerializer(RecipeSubscribeSerializer):
 
 
 class BaseCreateSerializer(serializers.ModelSerializer):
+    """The parent class for creating instances that include user field and
+    use for representing another serializer.
+    """
     represent_serializer = None
 
     class Meta:
@@ -59,11 +59,13 @@ class BaseCreateSerializer(serializers.ModelSerializer):
 
 
 class CartRepresentSerializer(BaseRepresentSerializer):
+    """Cart representing serializer."""
     class Meta(BaseRepresentSerializer.Meta):
         model = Cart
 
 
 class CartCreateSerializer(BaseCreateSerializer):
+    """Cart creating instance serializer."""
     represent_serializer = CartRepresentSerializer
 
     class Meta(BaseCreateSerializer.Meta):
@@ -72,12 +74,13 @@ class CartCreateSerializer(BaseCreateSerializer):
 
 
 class FavoriteRepresentSerializer(BaseRepresentSerializer):
-
+    """Favorite representing serializer."""
     class Meta(BaseRepresentSerializer.Meta):
         model = Favorite
 
 
 class FavoriteCreateSerializer(BaseCreateSerializer):
+    """Favorite creating instance serializer."""
     represent_serializer = FavoriteRepresentSerializer
 
     class Meta(BaseCreateSerializer.Meta):
@@ -86,6 +89,7 @@ class FavoriteCreateSerializer(BaseCreateSerializer):
 
 
 class SubscribeSerializer(serializers.ModelSerializer):
+    """Subscribe serializer."""
     email = serializers.ReadOnlyField(source='subscriber.email')
     id = serializers.ReadOnlyField(source='subscriber.id')
     username = serializers.ReadOnlyField(source='subscriber.username')
@@ -115,25 +119,20 @@ class SubscribeSerializer(serializers.ModelSerializer):
         ).exists()
 
     def get_recipes(self, obj):
-        recipes_limit = self.context.get("recipes_limit")
-        if recipes_limit is not None:
-            queryset = Recipe.objects.filter(
-                author=obj.subscriber
-            )[:int(recipes_limit)]
+        queryset, ok = get_recipes_with_limit(self, obj)
+        if ok:
             return RecipeSubscribeSerializer(queryset, many=True).data
-        queryset = Recipe.objects.filter(author=obj.subscriber)
         return RecipeSubscribeSerializer(queryset, many=True).data
 
     def get_recipes_count(self, obj):
-        recipes_limit = self.context.get("recipes_limit")
-        if recipes_limit is not None:
-            return Recipe.objects.filter(
-                author=obj.subscriber
-            )[:int(recipes_limit)].count()
-        return Recipe.objects.filter(author=obj.subscriber).count()
+        queryset, ok = get_recipes_with_limit(self, obj)
+        if ok:
+            return queryset.count()
+        return queryset.count()
 
 
 class SubscribeUserSerializer(BaseCreateSerializer):
+    """Subscribe creating instance serializer."""
     represent_serializer = SubscribeSerializer
 
     class Meta(BaseCreateSerializer.Meta):
@@ -149,6 +148,7 @@ class SubscribeUserSerializer(BaseCreateSerializer):
 
 
 class TagSerializer(serializers.ModelSerializer):
+    """Tag serializer."""
     color = Hex2NameColor()
 
     class Meta:
@@ -162,6 +162,9 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 class IngredientWithAmountSerializer(serializers.ModelSerializer):
+    """Ingredient serializer that shows the amount of it in particular
+    recipe.
+    """
     id = serializers.PrimaryKeyRelatedField(
         source='ingredient', queryset=Ingredient.objects.all())
     name = serializers.StringRelatedField(source='ingredient.name')
@@ -179,7 +182,7 @@ class IngredientWithAmountSerializer(serializers.ModelSerializer):
 
 
 class IngredientSerializer(serializers.ModelSerializer):
-
+    """Ingredient representing serializer."""
     class Meta:
         model = Ingredient
         fields = (
@@ -190,6 +193,7 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 
 class RecipeRepresentSerializer(serializers.ModelSerializer):
+    """Recipe representing serializer."""
     tags = TagSerializer(many=True)
     author = UserSerializer()
     ingredients = IngredientWithAmountSerializer(
@@ -231,6 +235,7 @@ class RecipeRepresentSerializer(serializers.ModelSerializer):
 
 
 class IngredientCreateRecipe(serializers.ModelSerializer):
+    """Ingredient creating instance serializer in recipe."""
     id = serializers.PrimaryKeyRelatedField(
         source='ingredient', queryset=Ingredient.objects.all())
 
@@ -243,6 +248,7 @@ class IngredientCreateRecipe(serializers.ModelSerializer):
 
 
 class RecipeInitialSerializer(serializers.ModelSerializer):
+    """Recipe creating instance serializer."""
     image = Base64ImageField()
     ingredients = IngredientCreateRecipe(many=True)
     tags = serializers.PrimaryKeyRelatedField(
@@ -261,52 +267,19 @@ class RecipeInitialSerializer(serializers.ModelSerializer):
         )
 
     def create(self, validated_data):
-        ingredients = validated_data.pop('ingredients')
-        tags = validated_data.pop('tags')
+        ingredients, tags = get_validated_ingredients_tags(validated_data)
         recipe = Recipe.objects.create(**validated_data)
-
-        for ingredient in ingredients:
-            current_ingredient = Ingredient.objects.get(
-                id=IngredientCreateRecipe(ingredient).data['id'],
-            )
-            IngredientRecipe.objects.create(
-                ingredient=current_ingredient,
-                recipe=recipe,
-                amount=IngredientCreateRecipe(ingredient).data['amount']
-            )
-        for tag in tags:
-            current_tag = Tag.objects.get(pk=tag.id)
-            TagRecipe.objects.create(
-                tag=current_tag, recipe=recipe
-            )
+        create_update_fk_recipe_instance(
+            recipe, self, ingredients, tags, IngredientCreateRecipe
+        )
         return recipe
 
     def update(self, instance, validated_data):
-        print(self.initial_data)
-        print(validated_data)
-        ingredients = validated_data.pop('ingredients')
-        tags = validated_data.pop('tags')
-
+        ingredients, tags = get_validated_ingredients_tags(validated_data)
         recipe = Recipe.objects.get(id=instance.id)
-        if len(ingredients) > 0:
-            IngredientRecipe.objects.filter(recipe=instance.id).delete()
-            for ingredient in ingredients:
-                current_ingredient = Ingredient.objects.get(
-                    id=IngredientCreateRecipe(ingredient).data['id'],
-                )
-                IngredientRecipe.objects.create(
-                    ingredient=current_ingredient,
-                    recipe=recipe,
-                    amount=IngredientCreateRecipe(ingredient).data['amount']
-                )
-        if len(tags) > 0:
-            TagRecipe.objects.filter(recipe=instance.id).delete()
-            for tag in tags:
-                current_tag = Tag.objects.get(pk=tag.id)
-                TagRecipe.objects.create(
-                    tag=current_tag, recipe=recipe
-                )
-
+        create_update_fk_recipe_instance(
+            recipe, self, ingredients, tags, IngredientCreateRecipe
+        )
         return super().update(instance, validated_data)
 
     def validate_name(self, value):

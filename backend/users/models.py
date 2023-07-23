@@ -1,15 +1,16 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
+ADMIN_ROLE = 'admin'
+USER_ROLE = 'user'
 ROLES = (
-    ('user', 'user'),
-    ('admin', 'admin'),
+    ('user', USER_ROLE),
+    ('admin', ADMIN_ROLE),
 )
 
 
 class User(AbstractUser):
-    """Таблица пользователей"""
-
+    """Custom User model."""
     REQUIRED_FIELDS = (
         'first_name',
         'last_name',
@@ -42,7 +43,7 @@ class User(AbstractUser):
     role = models.CharField(
         max_length=50,
         choices=ROLES,
-        default='user',
+        default=USER_ROLE,
         verbose_name='Роль пользователя',
     )
 
@@ -53,13 +54,17 @@ class User(AbstractUser):
 
     def save(self, *args, **kwargs):
         if self.is_superuser:
-            self.role = 'admin'
+            self.role = ADMIN_ROLE
         super().save(*args, **kwargs)
+
+    def is_admin(self):
+        return self.role == ADMIN_ROLE
+
+    check_is_admin = property(is_admin)
 
 
 class Subscriber(models.Model):
-    """Таблица подписок"""
-
+    """Subscriber model."""
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -74,6 +79,11 @@ class Subscriber(models.Model):
     )
 
     class Meta:
-        unique_together = ('user', 'subscriber')
         verbose_name = 'Подписка'
         verbose_name_plural = 'Подписки'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'subscriber'],
+                name='unique_subscribe'
+            )
+        ]

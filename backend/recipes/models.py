@@ -2,13 +2,11 @@ from django.core import validators
 from django.db import models
 
 from recipes import consts
-
 from users.models import User
 
 
 class Tag(models.Model):
-    """Таблица тегов"""
-
+    """Tag model."""
     name = models.CharField(
         max_length=200,
         unique=True,
@@ -39,8 +37,7 @@ class Tag(models.Model):
 
 
 class Ingredient(models.Model):
-    """Таблица ингредиентов"""
-
+    """Ingredient model."""
     name = models.CharField(
         max_length=200,
         verbose_name='Название'
@@ -65,8 +62,7 @@ class Ingredient(models.Model):
 
 
 class Recipe(models.Model):
-    """Таблица рецептов"""
-
+    """Recipe model."""
     author = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
@@ -129,8 +125,7 @@ class Recipe(models.Model):
 
 
 class TagRecipe(models.Model):
-    """Таблица принадлежности тегов определенному рецепту"""
-
+    """Model that links Tag model and Recipe."""
     tag = models.ForeignKey(
         Tag,
         on_delete=models.CASCADE,
@@ -145,17 +140,23 @@ class TagRecipe(models.Model):
     )
 
     class Meta:
-        unique_together = ('tag', 'recipe')
         verbose_name = 'Тег рецепта'
         verbose_name_plural = 'Теги рецептов'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['tag', 'recipe'],
+                name=consts.TAG_RECIPE_CONSTRAINT_NAME
+            )
+        ]
 
     def __str__(self):
         return f'{self.tag} {self.recipe}'
 
 
 class IngredientRecipe(models.Model):
-    """Таблица связи ингрдиента и рецепта и количество ингредиентов"""
-
+    """Model that links Inngredient, Recipe models
+    and it amount.
+    """
     ingredient = models.ForeignKey(
         Ingredient,
         on_delete=models.CASCADE,
@@ -179,17 +180,21 @@ class IngredientRecipe(models.Model):
     )
 
     class Meta:
-        unique_together = ('ingredient', 'recipe')
         verbose_name = 'Количество ингрeдиента в рецепте'
         verbose_name_plural = 'Количество ингрeдиентов в рецептах'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['ingredient', 'recipe'],
+                name=consts.INGREDIENT_RECIPE_CONSTRAINT_NAME
+            )
+        ]
 
     def __str__(self):
         return f'{self.ingredient} {self.recipe}'
 
 
 class Favorite(models.Model):
-    """Таблица избранного"""
-
+    """Favorite model."""
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -204,14 +209,18 @@ class Favorite(models.Model):
     )
 
     class Meta:
-        unique_together = ('user', 'recipe')
         verbose_name = 'Избранное'
         verbose_name_plural = 'Список избранного'
+        # constraints = [
+        #     models.UniqueConstraint(
+        #         fields=['user', 'recipe'],
+        #         name=consts.FAVORITE_CONSTRAINT_NAME
+        #     )
+        # ]
 
 
 class Cart(models.Model):
-    """Таблица корзины"""
-
+    """Cart model."""
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -226,6 +235,11 @@ class Cart(models.Model):
     )
 
     class Meta:
-        unique_together = ('user', 'recipe')
         verbose_name = 'Покупка'
         verbose_name_plural = 'Список покупок'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'recipe'],
+                name=consts.CART_CONSTRAINT_NAME
+            )
+        ]

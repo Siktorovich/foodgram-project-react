@@ -1,11 +1,11 @@
 from django.contrib.auth.hashers import make_password
-
 from rest_framework import serializers
 
 from users.models import Subscriber, User
 
 
 class UserCreateSerializer(serializers.HyperlinkedModelSerializer):
+    """Serializer creating user instances."""
     password = serializers.CharField(
         write_only=True,
         required=True,
@@ -30,6 +30,7 @@ class UserCreateSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    """Serializer representing user instances."""
     email = serializers.EmailField(required=True)
     first_name = serializers.CharField(required=True)
     last_name = serializers.CharField(required=True)
