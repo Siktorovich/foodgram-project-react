@@ -1,5 +1,4 @@
-from django_filters import filters
-from django_filters.rest_framework import FilterSet
+from django_filters.rest_framework import FilterSet, filters
 
 from recipes.models import Recipe
 
@@ -9,11 +8,15 @@ from users.models import User
 class RecipeFilter(FilterSet):
     """Filter for Recipe"""
 
-    is_favorited = filters.BooleanFilter(method='filter_is_favorited')
-    is_in_shopping_cart = filters.BooleanFilter(
-        method='filter_is_in_shopping_cart'
+    is_favorited = filters.BooleanFilter(
+        method='filter_is_favorited',
+        field_name='is_favorited'
     )
-    author = filters.ModelChoiceField(queryset=User.objects.all())
+    is_in_shopping_cart = filters.BooleanFilter(
+        method='filter_is_in_shopping_cart',
+        field_name='is_in_shopping_cart'
+    )
+    author = filters.NumberFilter(field_name='author')
     tags = filters.AllValuesMultipleFilter(field_name='tags__slug')
 
     def filter_is_favorited(self, queryset, name, value):
