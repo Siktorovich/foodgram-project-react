@@ -11,7 +11,7 @@ from api.serializers import (
     SubscribeUserSerializer,
     TagSerializer
 )
-from api.utils import creating_pdf_list
+from api.utils import creating_pdf_list, query_validation
 
 from django.db.models import Sum
 from django.shortcuts import get_object_or_404
@@ -89,9 +89,17 @@ class SubscribeView(views.APIView):
     """View functions for subscribe endpoint"""
 
     def post(self, request, user_id):
-        serializer = SubscribeUserSerializer(
-            data={'user': request.user.id, 'subscriber': user_id}
-        )
+        recipes_limit = request.query_params.get('recipes_limit')
+        if recipes_limit is not None:
+            query_validation(recipes_limit)
+            serializer = SubscribeUserSerializer(
+                data={'user': request.user.id, 'subscriber': user_id},
+                context={'request': request, 'recipes_limit': recipes_limit}
+            )
+        else:
+            serializer = SubscribeUserSerializer(
+                data={'user': request.user.id, 'subscriber': user_id}
+            )
         if serializer.is_valid():
             serializer.save()
             return response.Response(
@@ -114,10 +122,23 @@ class SubscribeView(views.APIView):
 
 
 class SubscribeList(ListViewSet):
+    """View class for subscriptions list"""
+
     serializer_class = SubscribeSerializer
 
     def get_queryset(self):
         return Subscriber.objects.filter(user=self.request.user)
+
+    def get_serializer_context(self):
+        recipes_limit = self.request.query_params.get('recipes_limit')
+        context = super().get_serializer_context()
+        if recipes_limit is not None:
+            query_validation(int(recipes_limit))
+            context.update({
+                "request": self.request,
+                "recipes_limit": recipes_limit
+            })
+        return context
 
 
 class FavoriteView(CreateDeleteAPIViewMixin, views.APIView):

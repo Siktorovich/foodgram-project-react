@@ -6,6 +6,8 @@ from reportlab.lib.pagesizes import inch, letter
 from reportlab.pdfbase import pdfmetrics, ttfonts
 from reportlab.pdfgen import canvas
 
+from rest_framework import serializers
+
 
 def creating_pdf_list(ingredients):
     """Creating pdf file function"""
@@ -37,3 +39,12 @@ def creating_pdf_list(ingredients):
         filename='your_shop_list.pdf',
         content_type='application/pdf',
     )
+
+
+class QuerySerializer(serializers.Serializer):
+    query = serializers.IntegerField(min_value=0)
+
+
+def query_validation(query_param):
+    query_serializer = QuerySerializer(data={"query": query_param})
+    query_serializer.is_valid(raise_exception=True)

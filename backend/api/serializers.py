@@ -49,8 +49,12 @@ class BaseCreateSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         request = self.context.get('request')
+        recipes_limit = self.context.get('recipes_limit')
         return self.represent_serializer(
-            instance, context={'request': request}
+            instance, context={
+                'request': request,
+                'recipes_limit': recipes_limit
+            }
         ).data
 
 
@@ -111,10 +115,21 @@ class SubscribeSerializer(serializers.ModelSerializer):
         ).exists()
 
     def get_recipes(self, obj):
+        recipes_limit = self.context.get("recipes_limit")
+        if recipes_limit is not None:
+            queryset = Recipe.objects.filter(
+                author=obj.subscriber
+            )[:int(recipes_limit)]
+            return RecipeSubscribeSerializer(queryset, many=True).data
         queryset = Recipe.objects.filter(author=obj.subscriber)
         return RecipeSubscribeSerializer(queryset, many=True).data
 
     def get_recipes_count(self, obj):
+        recipes_limit = self.context.get("recipes_limit")
+        if recipes_limit is not None:
+            return Recipe.objects.filter(
+                author=obj.subscriber
+            )[:int(recipes_limit)].count()
         return Recipe.objects.filter(author=obj.subscriber).count()
 
 
