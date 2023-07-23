@@ -16,6 +16,8 @@ from api.utils import creating_pdf_list, query_validation
 from django.db.models import Sum
 from django.shortcuts import get_object_or_404
 
+from django_filters.rest_framework import DjangoFilterBackend
+
 from recipes.models import (
     Cart,
     Favorite,
@@ -83,6 +85,8 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = IngredientSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     pagination_class = None
+    filter_backends = (DjangoFilterBackend,)
+    filterset_fields = ('name',)
 
 
 class SubscribeView(views.APIView):
