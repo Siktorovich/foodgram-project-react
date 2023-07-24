@@ -211,12 +211,12 @@ class Favorite(models.Model):
     class Meta:
         verbose_name = 'Избранное'
         verbose_name_plural = 'Список избранного'
-        # constraints = [
-        #     models.UniqueConstraint(
-        #         fields=['user', 'recipe'],
-        #         name=consts.FAVORITE_CONSTRAINT_NAME
-        #     )
-        # ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'recipe'],
+                name=consts.FAVORITE_CONSTRAINT_NAME
+            )
+        ]
 
 
 class Cart(models.Model):

@@ -119,15 +119,11 @@ class SubscribeSerializer(serializers.ModelSerializer):
         ).exists()
 
     def get_recipes(self, obj):
-        queryset, ok = get_recipes_with_limit(self, obj)
-        if ok:
-            return RecipeSubscribeSerializer(queryset, many=True).data
+        queryset = get_recipes_with_limit(self, obj)
         return RecipeSubscribeSerializer(queryset, many=True).data
 
     def get_recipes_count(self, obj):
-        queryset, ok = get_recipes_with_limit(self, obj)
-        if ok:
-            return queryset.count()
+        queryset = get_recipes_with_limit(self, obj)
         return queryset.count()
 
 

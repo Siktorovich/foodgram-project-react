@@ -1,7 +1,10 @@
+from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
 
-from users.models import Subscriber, User
+from users.models import Subscriber
+
+User = get_user_model()
 
 
 class UserCreateSerializer(serializers.HyperlinkedModelSerializer):

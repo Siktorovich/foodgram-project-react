@@ -21,17 +21,7 @@ class ListViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     pass
 
 
-class CreateUpdateRetrieveDestroyListSet(
-    mixins.CreateModelMixin,
-    mixins.UpdateModelMixin,
-    mixins.RetrieveModelMixin,
-    mixins.DestroyModelMixin,
-    ListViewSet
-):
-    pass
-
-
-class RecipeViewSet(CreateUpdateRetrieveDestroyListSet):
+class RecipeViewSet(viewsets.ModelViewSet):
     """Viewset for recipes endpoint."""
     queryset = Recipe.objects.all()
     serializer_class = RecipeInitialSerializer
@@ -50,6 +40,11 @@ class RecipeViewSet(CreateUpdateRetrieveDestroyListSet):
         return super().get_queryset().prefetch_related(
             'ingredient_recipes'
         )
+
+    def update(self, request, *args, **kwargs):
+        if request.method == 'PUT':
+            return response.Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        return super().update(request, *args, **kwargs)
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
@@ -114,8 +109,8 @@ class SubscribeList(ListViewSet):
         if recipes_limit is not None:
             query_validation(int(recipes_limit))
             context.update({
-                "request": self.request,
-                "recipes_limit": recipes_limit
+                'request': self.request,
+                'recipes_limit': recipes_limit
             })
         return context
 

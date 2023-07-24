@@ -61,8 +61,8 @@ def get_recipes_with_limit(serializer_instance, subscriber_instance):
     if recipes_limit is not None:
         return subscriber_instance.subscriber.recipes.all()[
             :int(recipes_limit)
-        ], True
-    return subscriber_instance.subscriber.recipes.all(), False
+        ]
+    return subscriber_instance.subscriber.recipes.all()
 
 
 def is_patch_method(action_instance):
