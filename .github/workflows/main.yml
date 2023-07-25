@@ -1,4 +1,4 @@
-name: Main Kittygram workflow
+name: Main foodgram workflow
 
 on:
   push:
@@ -88,5 +88,3 @@ jobs:
             sudo docker compose -f docker-compose.yml down
             sudo docker compose -f docker-compose.yml up -d
             sudo docker compose -f docker-compose.yml exec backend python manage.py migrate
-            sudo docker compose -f docker-compose.yml exec backend python manage.py collectstatic
-            sudo docker compose -f docker-compose.yml exec backend cp -r /app/collected_static/. /backend_static/static/
