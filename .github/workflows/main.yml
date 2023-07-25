@@ -21,7 +21,7 @@ jobs:
   build_backend_and_push_to_docker_hub:
     name: Push Docker backend image to DockerHub
     runs-on: ubuntu-latest
-    needs: backend_tests
+    needs: linter
     steps:
       - name: Check out the repo
         uses: actions/checkout@v3
@@ -41,7 +41,7 @@ jobs:
   build_frontend_and_push_to_docker_hub:
     name: Push Docker frontend image to DockerHub
     runs-on: ubuntu-latest
-    needs: frontend_tests
+    needs: linter
     steps:
       - name: Check out the repo
         uses: actions/checkout@v3
@@ -63,7 +63,6 @@ jobs:
     needs:
       - build_backend_and_push_to_docker_hub
       - build_frontend_and_push_to_docker_hub
-      - build_gateway_and_push_to_docker_hub
     steps:
       - name: Check out the repo
         uses: actions/checkout@v3
