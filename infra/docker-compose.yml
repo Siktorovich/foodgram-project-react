@@ -16,7 +16,7 @@ services:
     image: siktorovich/foodgram_backend
     env_file: .env
     volumes:
-      - static:/app/static/
+      - static:/backend_static/
       - media:/app/media/
       - redoc:/app/api/docs/
     depends_on:
