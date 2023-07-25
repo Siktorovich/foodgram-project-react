@@ -37,7 +37,7 @@ jobs:
         with:
           context: ./backend/
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/kittygram_backend:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/foodgramm_backend:latest
   build_frontend_and_push_to_docker_hub:
     name: Push Docker frontend image to DockerHub
     runs-on: ubuntu-latest
