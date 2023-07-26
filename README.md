@@ -1,3 +1,8 @@
+# for_reviewer
+<b>server address</b> youaremyproject.ddns.net
+<b>login</b> moderator
+<b>password</b> moderator
+
 # praktikum_new_diplom
 
 [![python version](https://img.shields.io/static/v1?label=Python&message=3.9.5&color=97ca00&style=for-the-badge)](https://python.org)
