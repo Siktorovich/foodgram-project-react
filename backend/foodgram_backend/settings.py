@@ -13,7 +13,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split(',')
 
-CSRF_TRUSTED_ORIGINS = [os.getenv('TRUSTED_ORIGINS'),]
+CSRF_TRUSTED_ORIGINS = [os.getenv('TRUSTED_ORIGINS'), ]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -130,7 +130,7 @@ REST_FRAMEWORK = {
 }
 
 CORS_ALLOW_ALL_ORIGINS = True
-CORS_ALLOWED_ORIGIN_REGEXES = [r'^/api/.*$',]
+CORS_ALLOWED_ORIGIN_REGEXES = [r'^/api/.*$', ]
 
 DJOSER = {
     'HIDE_USERS': False,
