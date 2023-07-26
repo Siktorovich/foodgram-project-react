@@ -28,8 +28,7 @@ def creating_pdf_list(ingredients):
         measurement_unit = ingredient['ingredient__measurement_unit']
         amount = ingredient['amount']
         line = f'{index+1}. {name.title()} ({measurement_unit}) - {amount}'
-
-    text.textLine(line)
+        text.textLine(line)
     my_canvas.drawText(text)
     my_canvas.showPage()
     my_canvas.save()
