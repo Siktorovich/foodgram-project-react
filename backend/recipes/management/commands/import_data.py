@@ -42,13 +42,13 @@ class Command(BaseCommand):
             with open(DATA_PATH + FILENAME, 'r', newline='') as f:
                 reader = csv.reader(f, delimiter=',')
                 try:
-                    for i, row in enumerate(reader):
+                    for row in reader:
                         if reader.line_num == 1:
                             continue
                         else:
                             cur.execute(
                                 f'INSERT INTO recipes_ingredient '
-                                f'VALUES ({i},?,?)',
+                                f'VALUES (?,?)',
                                 row
                             )
                             self.imported_counter += 1
