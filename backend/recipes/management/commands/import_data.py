@@ -47,7 +47,8 @@ class Command(BaseCommand):
                             continue
                         else:
                             cur.execute(
-                                f'INSERT INTO recipes_ingredient VALUES ({i},?,?)',
+                                f'INSERT INTO recipes_ingredient '
+                                f'VALUES ({i},?,?)',
                                 row
                             )
                             self.imported_counter += 1
@@ -56,7 +57,9 @@ class Command(BaseCommand):
                 conn.commit()
                 conn.close()
         except (Exception, Error) as error:
-            sys.exit(f'Ошибка при создании соединения, {err}')
+
+            sys.exit(f'Ошибка при создании соединения, {error}')
+
     def handle(self, *args, **kwargs):
         self.starting_import()
         self.import_ingredients()
