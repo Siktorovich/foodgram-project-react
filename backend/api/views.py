@@ -6,6 +6,7 @@ from rest_framework import (decorators, mixins, permissions, response, status,
 
 from api.filters import RecipeFilter
 from api.mixins import CreateDeleteAPIViewMixin
+from api.pagination import CustomLimitPageNumberPagination
 from api.permissions import OwnerSuperUserOrReadOnly
 from api.serializers import (CartCreateSerializer, FavoriteCreateSerializer,
                              IngredientSerializer, RecipeInitialSerializer,
@@ -27,6 +28,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
     serializer_class = RecipeInitialSerializer
     permission_classes = (permissions.AllowAny,)
     filterset_class = RecipeFilter
+    pagination_class = CustomLimitPageNumberPagination
+    filter_backends = (DjangoFilterBackend,)
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
