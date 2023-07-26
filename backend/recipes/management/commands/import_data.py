@@ -47,8 +47,8 @@ class Command(BaseCommand):
                             continue
                         else:
                             cur.execute(
-                                f'INSERT INTO recipes_ingredient '
-                                f'VALUES (?,?)',
+                                'INSERT INTO recipes_ingredient '
+                                'VALUES (?,?)',
                                 row
                             )
                             self.imported_counter += 1
