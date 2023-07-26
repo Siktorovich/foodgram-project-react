@@ -1,13 +1,14 @@
-from django.contrib import admin
+from django.contrib.admin import ModelAdmin, register
 from django.contrib.auth import get_user_model
+from django.contrib.auth.admin import UserAdmin
 
 from users.models import Subscriber
 
 User = get_user_model()
 
 
-@admin.register(User)
-class UserAdmin(admin.ModelAdmin):
+@register(User)
+class CustomUserAdmin(UserAdmin):
     """Class for User model in admin panel."""
     list_display = (
         'pk',
@@ -27,8 +28,8 @@ class UserAdmin(admin.ModelAdmin):
     )
 
 
-@admin.register(Subscriber)
-class SubscriberAdmin(admin.ModelAdmin):
+@register(Subscriber)
+class SubscriberAdmin(ModelAdmin):
     """Class for Subscriber model in admin panel."""
     list_display = (
         'user',
