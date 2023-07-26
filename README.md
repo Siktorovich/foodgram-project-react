@@ -1,7 +1,11 @@
 # for_reviewer
 <b>server address</b> youaremyproject.ddns.net
+
 <b>login</b> moderator
+
 <b>password</b> moderator
+
+<b>eMail</b> moderator@moderator.ru
 
 # praktikum_new_diplom
 
