@@ -1,12 +1,14 @@
 import csv
-import sqlite3
+import os
+import psycopg2
 import sys
+from dotenv import load_dotenv
+from psycopg2 import Error
 
 from django.core.management.base import BaseCommand
 
 DATA_PATH = './data/'
 FILENAME = 'ingredients.csv'
-DATABASE_NAME = 'db.sqlite3'
 
 
 class Command(BaseCommand):
@@ -27,25 +29,34 @@ class Command(BaseCommand):
         )
 
     def import_ingredients(self):
-        conn = sqlite3.connect(DATABASE_NAME)
-        cur = conn.cursor()
-        with open(DATA_PATH + FILENAME, 'r', newline='') as f:
-            reader = csv.reader(f, delimiter=',')
-            try:
-                for i, row in enumerate(reader):
-                    if reader.line_num == 1:
-                        continue
-                    else:
-                        cur.execute(
-                            f'INSERT INTO recipes_ingredient VALUES ({i},?,?)',
-                            row
-                        )
-                        self.imported_counter += 1
-            except csv.Error as err:
-                sys.exit(f'{FILENAME}, line {reader.line_num}: {err}')
-            conn.commit()
-            conn.close()
-
+        try:
+            load_dotenv()
+            conn = psycopg2.connect(
+                user=os.getenv('POSTGRES_USER', 'empty'),
+                password=os.getenv('POSTGRES_PASSWORD', 'empty'),
+                port=os.getenv('DB_PORT', 5432),
+                host=os.getenv('DB_HOST', 'empty'),
+                database=os.getenv('POSTGRES_DB', 'empty')
+            )
+            cur = conn.cursor()
+            with open(DATA_PATH + FILENAME, 'r', newline='') as f:
+                reader = csv.reader(f, delimiter=',')
+                try:
+                    for i, row in enumerate(reader):
+                        if reader.line_num == 1:
+                            continue
+                        else:
+                            cur.execute(
+                                f'INSERT INTO recipes_ingredient VALUES ({i},?,?)',
+                                row
+                            )
+                            self.imported_counter += 1
+                except csv.Error as err:
+                    sys.exit(f'{FILENAME}, line {reader.line_num}: {err}')
+                conn.commit()
+                conn.close()
+        except (Exception, Error) as error:
+            sys.exit(f'Ошибка при создании соединения, {err}')
     def handle(self, *args, **kwargs):
         self.starting_import()
         self.import_ingredients()
