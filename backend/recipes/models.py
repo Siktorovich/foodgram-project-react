@@ -31,6 +31,7 @@ class Tag(models.Model):
     class Meta:
         verbose_name = 'Тег'
         verbose_name_plural = 'Теги'
+        ordering = ('name',)
 
     def __str__(self):
         return self.name
@@ -50,6 +51,7 @@ class Ingredient(models.Model):
     class Meta:
         verbose_name = 'Ингредиент'
         verbose_name_plural = 'Ингредиенты'
+        ordering = ('name',)
         constraints = [
             models.UniqueConstraint(
                 fields=('name', 'measurement_unit'),

@@ -13,7 +13,7 @@ def creating_pdf_list(ingredients):
     """Creating pdf file function."""
     buffer = io.BytesIO()
     pdfmetrics.registerFont(ttfonts.TTFont(
-        'Garamond', 'static/Garamond.ttf'
+        'Garamond', 'fonts/Garamond.ttf'
     ))
     my_canvas = canvas.Canvas(buffer, pagesize=letter, bottomup=0)
     text = my_canvas.beginText()
