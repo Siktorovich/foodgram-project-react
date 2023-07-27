@@ -1,7 +1,7 @@
 from rest_framework import exceptions, serializers
 
 from api.fields import Base64ImageField, Hex2NameColor
-from api.utils import (create_update_fk_recipe_instance,
+from api.utils import (create_update_fk_recipe_instance, is_patch_method,
                        get_recipes_with_limit, get_validated_ingredients_tags)
 from recipes import consts
 from recipes.models import (Cart, Favorite, Ingredient, IngredientRecipe,
@@ -279,7 +279,9 @@ class RecipeInitialSerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
 
     def validate_name(self, value):
-        if Recipe.objects.filter(name=value).exists():
+        if Recipe.objects.filter(
+            name=value
+        ).exists() and not is_patch_method(self):
             raise exceptions.ValidationError(
                 consts.UNIQUE_NAME_RECIPE + value
             )

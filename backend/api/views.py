@@ -4,7 +4,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import (decorators, mixins, permissions, response, status,
                             views, viewsets)
 
-from api.filters import RecipeFilter
+from api.filters import IngredientFilter, RecipeFilter
 from api.mixins import CreateDeleteAPIViewMixin
 from api.pagination import CustomLimitPageNumberPagination
 from api.permissions import OwnerSuperUserOrReadOnly
@@ -65,7 +65,7 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     pagination_class = None
     filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('name',)
+    filterset_class = IngredientFilter
 
 
 class SubscribeView(views.APIView):
