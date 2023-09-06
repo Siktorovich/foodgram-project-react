@@ -7,6 +7,7 @@
 
 # About project
 You can play with project on https://youaremyproject.ddns.net/
+
 The project is a site Foodgram (or your personal "Product assistant")
 You can publicate recipes, subscribe on publications other users, add recipes that you like in favorites and download list of ingredients that you put in your cart
 
