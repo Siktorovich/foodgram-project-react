@@ -118,7 +118,7 @@ python3 manage.py runserver
 
 ## Database
 
-База данных построена на основе SQLITE.  
+База данных построена на основе POSTGRESQL.  
 [Database schema](https://dbdocs.io/siktorovich/foodgram?view=relationships) created with
 [DBML](https://www.dbml.org/docs/#project-definition) and app [dbdocs](https://dbdocs.io/).  
 Schema file [graph-db.dbml](https://github.com/Siktorovich/foodgram-project-react/blob/master/backend/graph-db.dbml).
