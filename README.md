@@ -6,7 +6,6 @@
 ![api version](https://img.shields.io/static/v1?label=API%20VERSION&message=1.0.0&color=77ca00&style=for-the-badge)
 
 # About project
-You can play with project on https://youaremyproject.ddns.net/
 
 The project is a site Foodgram (or your personal "Product assistant")
 You can publicate recipes, subscribe on publications other users, add recipes that you like in favorites and download list of ingredients that you put in your cart
